@@ -33,7 +33,7 @@ Following characteristics:
 
 #### Network 1
 
-```hcl-terraform
+```terraform
 resource "google_compute_network" "public_vpc_1" {
   name                    = "public-vpc-1"
   project                 = module.project_vpc_1.project_id
@@ -74,7 +74,7 @@ resource "google_compute_subnetwork" "public_subnet_2" {
 ```
 
 #### Network 2
-```hcl-terraform
+```terraform
 resource "google_compute_network" "private_vpc_2" {
   name                    = "private-vpc-2"
   project                 = module.project_vpc_2.project_id
@@ -124,7 +124,7 @@ VPN Gateways to connect both projects over VPN.  To make sure we have 99.99% SLA
 They have to be in the same region as the one used for the Cloud Routers.
 
 #### VPN Gateway 1
-```hcl-terraform
+```terraform
 resource "google_compute_ha_vpn_gateway" "gw_vpc_1" {
   provider = google-beta
   project  = module.project_vpc_1.project_id
@@ -137,7 +137,7 @@ resource "google_compute_ha_vpn_gateway" "gw_vpc_1" {
 ```
 
 #### VPN Gateway 2
-```hcl-terraform
+```terraform
 resource "google_compute_ha_vpn_gateway" "gw_vpc_2" {
   provider = google-beta
   project  = module.project_vpc_2.project_id
@@ -153,7 +153,7 @@ resource "google_compute_ha_vpn_gateway" "gw_vpc_2" {
 One Cloud Router in each project, which will be connected to the VPN gateways.
 
 #### Cloud Router 1
-```hcl-terraform
+```terraform
 resource "google_compute_router" "cr_vpc_1" {
   project = module.project_vpc_1.project_id
 
@@ -169,7 +169,7 @@ resource "google_compute_router" "cr_vpc_1" {
 ```
 
 #### Cloud Router 2 
-```hcl-terraform
+```terraform
 resource "google_compute_router" "cr_vpc_2" {
   project = module.project_vpc_2.project_id
 
@@ -191,7 +191,7 @@ So, for example, if Gateway 1 - Interface 0 has secret "This is a test", you hav
 As HA VPN is still in beta, you'll have to use the *beta* provider for Terraform.  
 
 #### Gateway 1
-```hcl-terraform
+```terraform
 ## Gateway 1, Tunnel 0
 resource "google_compute_vpn_tunnel" "vpn_tunnel_gw1_int0" {
   provider = google-beta
@@ -221,7 +221,7 @@ resource "google_compute_vpn_tunnel" "vpn_tunnel_gw1_int1" {
 }
 ```
 #### Gateway 2
-```hcl-terraform
+```terraform
 ## Gateway 2, Tunnel 0
 resource "google_compute_vpn_tunnel" "vpn_tunnel_gw2_int0" {
   provider = google-beta
@@ -269,7 +269,7 @@ As you can see, it cross references the IP range configured at the other end of 
 When configuring the ASN, you have to pick the ASN that was configured on the other end of the tunnel, as you are establishing the connection with the other end of the tunnel.
 
 #### Tunnel 0
-```hcl-terraform
+```terraform
 ## Cloud Router 1, Interface 0
 resource "google_compute_router_interface" "cr1_int0_to_gw2_int0" {
   provider = google-beta
@@ -322,7 +322,7 @@ resource "google_compute_router_peer" "cr2_int0_to_gw1_int0_peer" {
 ```
 
 #### Tunnel 1
-```hcl-terraform
+```terraform
 ## Cloud Router 1, Interface 1
 resource "google_compute_router_interface" "cr1_int1_to_gw2_int1" {
   provider = google-beta
