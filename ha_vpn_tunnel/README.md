@@ -26,6 +26,11 @@ The Terraform files create the following resources:
 Projects were created by using the Project module in tf-modules.  For more information, please refer to that repository. Only `compute.googleapis.com` has to be enabled for this setup.
 
 ### Networks
+
+Following characteristics:
+* Subnets are created manually.
+* VPC flow logs are enabled, by adding the `log_config`-block
+
 #### Network 1
 
 ```hcl-terraform
@@ -110,6 +115,72 @@ resource "google_compute_subnetwork" "private_subnet_2" {
   }
 
   private_ip_google_access = true
+}
+```
+
+### VPN Gateways
+VPN Gateways to connect both projects over VPN.  To make sure we have 99.99% SLA, there will be 4 tunnels in total, 2 between each VPN Gateway.
+
+They have to be in the same region as the one used for the Cloud Routers.
+
+#### VPN Gateway 1
+```hcl-terraform
+resource "google_compute_ha_vpn_gateway" "gw_vpc_1" {
+  provider = google-beta
+  project  = module.project_vpc_1.project_id
+
+  network     = google_compute_network.public_vpc_1.self_link
+  name        = "gw-vpc-1"
+  description = "VPN Gateway VPC 1."
+  region      = "europe-west1"
+}
+```
+
+#### VPN Gateway 2
+```hcl-terraform
+resource "google_compute_ha_vpn_gateway" "gw_vpc_2" {
+  provider = google-beta
+  project  = module.project_vpc_2.project_id
+
+  network     = google_compute_network.private_vpc_2.self_link
+  name        = "gw-vpc-2"
+  description = "VPN Gateway VPC 2."
+  region      = "europe-west1"
+}
+```
+
+### Cloud Routers
+One Cloud Router in each project, which will be connected to the VPN gateways.
+
+#### Cloud Router 1
+```hcl-terraform
+resource "google_compute_router" "cr_vpc_1" {
+  project = module.project_vpc_1.project_id
+
+  network     = google_compute_network.public_vpc_1.self_link
+  name        = "cr-vpc-1"
+  description = "Cloud Router VPC1, region europe-west1"
+  region      = "europe-west1"
+
+  bgp {
+    asn = 65001
+  }
+}
+```
+
+#### Cloud Router 2 
+```hcl-terraform
+resource "google_compute_router" "cr_vpc_2" {
+  project = module.project_vpc_2.project_id
+
+  network     = google_compute_network.private_vpc_2.self_link
+  name        = "cr-vpc-2"
+  description = "Cloud Router VPC2, region europe-west1."
+  region      = "europe-west1"
+
+  bgp {
+    asn = 65002
+  }
 }
 ```
 
