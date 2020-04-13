@@ -374,6 +374,24 @@ resource "google_compute_router_peer" "cr2_int1_to_gw1_int1_peer" {
 }
 ```
 
+### Virtual Machines
+The architecture consists of 2 Virtual Machines.  1 Bastion, available with a public IP address that allows SSH access. The second VM resides in a subnet with private access enabled and does **not** have a public IP.  Enabling private access ensures that the second VM can access the GCS bucket, which is accessible over a public IP.
+
+#### Debian image
+Use a datablock to get the URL to the image.
+
+```terraform
+data "google_compute_image" "debian" {
+  family  = "debian-9"
+  project = "debian-cloud"
+}
+```
+
+#### Bastion
+
+The Bastion host is a simple virtual machine, with a firewall rule that allows access on port 22, to a public IP address.  There is a service account linked to 
+
+#### Bastion
 
 
 
