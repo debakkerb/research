@@ -257,12 +257,12 @@ This was the part where I struggled the most.  The documentation wasn't very cle
 
 This is a table to make it more clear:
 
-|               | Cloud Router 1   | Cloud Router 2   |
-|---------------|------------------|------------------|
-| *Interface 0* | 169.254.100.1/30 | 169.254.100.2/30 |
-| *Peer 0*      | 169.254.100.2    | 169.254.100.1    |
-| *Interface 1* | 169.254.200.1/30 | 169.254.200.2/30 |
-| *Peer 1*      | 169.254.200.2    | 169.254.200.1    |
+|                 | Cloud Router 1   | Cloud Router 2   |
+|-----------------|------------------|------------------|
+| **Interface 0** | 169.254.100.1/30 | 169.254.100.2/30 |
+| **Peer 0**      | 169.254.100.2    | 169.254.100.1    |
+| **Interface 1** | 169.254.200.1/30 | 169.254.200.2/30 |
+| **Peer 1**      | 169.254.200.2    | 169.254.200.1    |
 
 As you can see, it cross references the IP range configured at the other end of the tunnel, when selecting the IP address of the Peer.
 
