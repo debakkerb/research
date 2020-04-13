@@ -183,6 +183,197 @@ resource "google_compute_router" "cr_vpc_2" {
   }
 }
 ```
+### VPN Tunnels
+There are 2 tunnels per Gateway, to ensure HA setup.  They connect interface 0 and interface 1 on both Gateways with each other.  You can use different Secrets per tunnel, just make sure you use the same secret on both ends. 
+
+So, for example, if Gateway 1 - Interface 0 has secret "This is a test", you have to configure the same secret on Gateway 2, Interface 0.  There aren't strict rules around generating a secret, but I used `openssl rand -base64 24 | pbcopy`, which is one of the official recommendations.
+
+As HA VPN is still in beta, you'll have to use the *beta* provider for Terraform.  
+
+#### Gateway 1
+```hcl-terraform
+## Gateway 1, Tunnel 0
+resource "google_compute_vpn_tunnel" "vpn_tunnel_gw1_int0" {
+  provider = google-beta
+  project  = module.project_vpc_1.project_id
+
+  name                  = "vpn-tunnel-gw1-int0"
+  region                = "europe-west1"
+  router                = google_compute_router.cr_vpc_1.self_link
+  vpn_gateway           = google_compute_ha_vpn_gateway.gw_vpc_1.self_link
+  peer_gcp_gateway      = google_compute_ha_vpn_gateway.gw_vpc_2.self_link
+  shared_secret         = "W0jYlpRWM2Y1hfUy9NucPVAscLBnowFh"
+  vpn_gateway_interface = 0
+}
+
+## Gateway 1, Tunnel 1
+resource "google_compute_vpn_tunnel" "vpn_tunnel_gw1_int1" {
+  provider = google-beta
+  project  = module.project_vpc_1.project_id
+
+  name                  = "vpn-tunnel-gw1-int1"
+  region                = "europe-west1"
+  router                = google_compute_router.cr_vpc_1.self_link
+  vpn_gateway           = google_compute_ha_vpn_gateway.gw_vpc_1.self_link
+  peer_gcp_gateway      = google_compute_ha_vpn_gateway.gw_vpc_2.self_link
+  shared_secret         = "LYpL4ppRkb0kUGnWn8txxeZC1XQ0xCFD"
+  vpn_gateway_interface = 1
+}
+```
+#### Gateway 2
+```hcl-terraform
+## Gateway 2, Tunnel 0
+resource "google_compute_vpn_tunnel" "vpn_tunnel_gw2_int0" {
+  provider = google-beta
+  project  = module.project_vpc_2.project_id
+
+  name                  = "vpn-tunnel-gw2-int0"
+  region                = "europe-west1"
+  router                = google_compute_router.cr_vpc_2.self_link
+  vpn_gateway           = google_compute_ha_vpn_gateway.gw_vpc_2.self_link
+  peer_gcp_gateway      = google_compute_ha_vpn_gateway.gw_vpc_1.self_link
+  shared_secret         = "W0jYlpRWM2Y1hfUy9NucPVAscLBnowFh"
+  vpn_gateway_interface = 0
+}
+
+## Gateway 2, Tunnel 1
+resource "google_compute_vpn_tunnel" "vpn_tunnel_gw2_int1" {
+  provider = google-beta
+  project  = module.project_vpc_2.project_id
+
+  name                  = "vpn-tunnel-gw2-int1"
+  region                = "europe-west1"
+  router                = google_compute_router.cr_vpc_2.self_link
+  vpn_gateway           = google_compute_ha_vpn_gateway.gw_vpc_2.self_link
+  peer_gcp_gateway      = google_compute_ha_vpn_gateway.gw_vpc_1.self_link
+  shared_secret         = "LYpL4ppRkb0kUGnWn8txxeZC1XQ0xCFD"
+  vpn_gateway_interface = 1
+}
+```
+### Interfaces and BGP Peer
+Once all this in place, you need to enable communication on both ends of the tunnels.  This means that you have to create an interface on the Cloud Router, which allows communication.  The second step is to enable the BGP peering session.  Once this is in place, the handshake happens and the BGP peering session is established.
+
+This was the part where I struggled the most.  The documentation wasn't very clear on what you need to do in terms of IP addresses.  Each interface is configured with a /30 block, coming from the range 169.254.0.0/16.  The corresponding peer **on the other side** has to be configured with an ip address coming from the /30 block on the interface on the other side.
+
+This is a table to make it more clear:
+
+|               | Cloud Router 1   | Cloud Router 2   |
+|---------------|------------------|------------------|
+| *Interface 0* | 169.254.100.1/30 | 169.254.100.2/30 |
+| *Peer 0*      | 169.254.100.2    | 169.254.100.1    |
+| *Interface 1* | 169.254.200.1/30 | 169.254.200.2/30 |
+| *Peer 1*      | 169.254.200.2    | 169.254.200.1    |
+
+As you can see, it cross references the IP range configured at the other end of the tunnel, when selecting the IP address of the Peer.
+
+When configuring the ASN, you have to pick the ASN that was configured on the other end of the tunnel, as you are establishing the connection with the other end of the tunnel.
+
+#### Tunnel 0
+```hcl-terraform
+## Cloud Router 1, Interface 0
+resource "google_compute_router_interface" "cr1_int0_to_gw2_int0" {
+  provider = google-beta
+  project  = module.project_vpc_1.project_id
+
+  name       = "router1-interface0"
+  router     = google_compute_router.cr_vpc_1.name
+  region     = "europe-west1"
+  ip_range   = "169.254.100.1/30"
+  vpn_tunnel = google_compute_vpn_tunnel.vpn_tunnel_gw1_int0.self_link
+}
+
+resource "google_compute_router_peer" "cr1_int0_to_gw2_int0_peer" {
+  provider = google-beta
+  project  = module.project_vpc_1.project_id
+
+  name                      = "router1-int0-peer"
+  router                    = google_compute_router.cr_vpc_1.name
+  interface                 = google_compute_router_interface.cr1_int0_to_gw2_int0.name
+  region                    = "europe-west1"
+  peer_ip_address           = "169.254.100.2"
+  peer_asn                  = 65002
+  advertised_route_priority = 100
+}
+
+## Cloud Router 2, Interface 0
+resource "google_compute_router_interface" "cr2_int0_to_gw1_int0" {
+  provider = google-beta
+  project  = module.project_vpc_2.project_id
+
+  name       = "router2-interface0"
+  router     = google_compute_router.cr_vpc_2.name
+  region     = "europe-west1"
+  ip_range   = "169.254.100.2/30"
+  vpn_tunnel = google_compute_vpn_tunnel.vpn_tunnel_gw2_int0.self_link
+}
+
+resource "google_compute_router_peer" "cr2_int0_to_gw1_int0_peer" {
+  provider = google-beta
+  project  = module.project_vpc_2.project_id
+
+  name                      = "router2-int0-peer"
+  region                    = "europe-west1"
+  router                    = google_compute_router.cr_vpc_2.name
+  interface                 = google_compute_router_interface.cr2_int0_to_gw1_int0.name
+  peer_ip_address           = "169.254.100.1"
+  peer_asn                  = 65001
+  advertised_route_priority = 100
+}
+```
+
+#### Tunnel 1
+```hcl-terraform
+## Cloud Router 1, Interface 1
+resource "google_compute_router_interface" "cr1_int1_to_gw2_int1" {
+  provider = google-beta
+  project  = module.project_vpc_1.project_id
+
+  name       = "router1-interface1"
+  router     = google_compute_router.cr_vpc_1.name
+  region     = "europe-west1"
+  ip_range   = "169.254.200.1/30"
+  vpn_tunnel = google_compute_vpn_tunnel.vpn_tunnel_gw1_int1.self_link
+}
+
+resource "google_compute_router_peer" "cr1_int1_to_gw2_int1_peer" {
+  provider = google-beta
+  project  = module.project_vpc_1.project_id
+
+  name                      = "router1-int1-peer"
+  region                    = "europe-west1"
+  router                    = google_compute_router.cr_vpc_1.name
+  interface                 = google_compute_router_interface.cr1_int1_to_gw2_int1.name
+  peer_ip_address           = "169.254.200.2"
+  peer_asn                  = 65002
+  advertised_route_priority = 100
+}
+
+## Cloud Router 2, Interface 1
+resource "google_compute_router_interface" "cr2_int1_to_gw1_int1" {
+  provider = google-beta
+  project  = module.project_vpc_2.project_id
+
+  name       = "router2-interface1"
+  router     = google_compute_router.cr_vpc_2.name
+  region     = "europe-west1"
+  ip_range   = "169.254.200.2/30"
+  vpn_tunnel = google_compute_vpn_tunnel.vpn_tunnel_gw2_int1.self_link
+}
+
+resource "google_compute_router_peer" "cr2_int1_to_gw1_int1_peer" {
+  provider = google-beta
+  project  = module.project_vpc_2.project_id
+
+  name                      = "router2-int1-peer"
+  region                    = "europe-west1"
+  router                    = google_compute_router.cr_vpc_2.name
+  interface                 = google_compute_router_interface.cr2_int1_to_gw1_int1.name
+  peer_ip_address           = "169.254.200.1"
+  peer_asn                  = 65001
+  advertised_route_priority = 100
+}
+```
+
 
 
 
