@@ -4,4 +4,7 @@ This repository contains a number of scripts which have been used to investigate
 
 ## Scenarios
 * [HA VPN](./ha_vpn_tunnel/)
+* [DNS Hub and Spoke](./dns_hub_spoke)
+* [Audit Sinks](./audit_sink)
+* [VPC SC](./vpc_sc)
 
