@@ -388,12 +388,111 @@ data "google_compute_image" "debian" {
 ```
 
 #### Bastion
+Configuration details: 
+- Empty access_config passed in, to grant a public IP address to the Compute instance.
+- Metadata `enable-oslogin = "TRUE"` added to login with osLogin.
+- Custom service account added to the VM, as the default Compute SA is too permissive.
+- Scopes set to `cloud-platform`, which enables all APIs.  However, the permissions of the Service Account will determine what the VM can or can't do.
+- Firewall rule that allows access on port 22, with the Service Account of the VM as target.
+- On project 2, the one with private access and the GCS bucket, give `roles/iam.serviceAccountUser` to the Service Account used by the bastion, to the Service Account attached to the second VM.
 
-The Bastion host is a simple virtual machine, with a firewall rule that allows access on port 22, to a public IP address.  There is a service account linked to 
+##### VM Definition
 
-#### Bastion
+```terraform
+resource "google_compute_instance" "bastion" {
+  project = module.project_vpc_1.project_id
 
+  machine_type = "n1-standard-1"
+  name         = "bastion"
+  zone         = "europe-west1-b"
 
+  boot_disk {
+    initialize_params {
+      image = data.google_compute_image.debian.self_link
+    }
+  }
 
+  network_interface {
+    subnetwork = google_compute_subnetwork.public_subnet_1.self_link
+
+    access_config {}
+  }
+
+  metadata = {
+    enable-oslogin = "TRUE"
+  }
+
+  service_account {
+    email = google_service_account.compute_service_account.email
+    scopes = [
+      "cloud-platform"
+    ]
+  }
+}
+```
+
+##### Firewall
+Firewall rule allows access to port 22, with the Compute Service Account as target.  
+
+```terraform
+resource "google_compute_firewall" "public_ssh_access" {
+  project = module.project_vpc_1.project_id
+
+  name    = "public-ssh-access"
+  network = google_compute_network.public_vpc_1.self_link
+
+  allow {
+    protocol = "icmp"
+  }
+
+  allow {
+    protocol = "tcp"
+    ports    = ["22"]
+  }
+
+  source_ranges = [
+    "[PUBLIC_IP]/32"
+  ]
+
+  enable_logging = true
+
+  target_service_accounts = [
+    google_service_account.compute_service_account.email
+  ]
+}
+```
+
+##### Service Account
+
+Service Account for the Bastion host.  This one will be used to provide SSH access to the VM in the private project.
+
+```terraform
+resource "google_service_account" "bastion_service_account" {
+  project = module.project_vpc_1.project_id
+
+  account_id   = "sa-bastion"
+  display_name = "Bastion Service Account"
+  description  = "Service account for the Bastion host."
+}
+
+# Provide osLogin access to the target project.
+resource "google_project_iam_member" "sa_compute_role" {
+  project = module.project_vpc_2.project_id
+
+  member = "serviceAccount:${google_service_account.bastion.email}"
+  role   = "roles/compute.osAdminLogin"
+}
+
+# Give SA user access rights on the Service Account of the second VM, to the Service Account attached to the bastion.
+
+# Add your personal user to allow to use the SA of the Bastion.
+resource "google_service_account_iam_member" "bdb_sa_access" {
+  member             = "user:[EMAIL]"
+  role               = "roles/iam.serviceAccountUser"
+  service_account_id = google_service_account.bastion.name
+}
+```
+
+##### 
 
 
