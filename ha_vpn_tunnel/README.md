@@ -484,6 +484,11 @@ resource "google_project_iam_member" "sa_compute_role" {
 }
 
 # Give SA user access rights on the Service Account of the second VM, to the Service Account attached to the bastion.
+resource "google_service_account_iam_member" "gcs_access_sa_access" {
+  member             = "serviceAccount:${google_service_account.bastion.email}"
+  role               = "roles/iam.serviceAccountUser"
+  service_account_id = google_service_account.sa_gcs_access.name
+}
 
 # Add your personal user to allow to use the SA of the Bastion.
 resource "google_service_account_iam_member" "bdb_sa_access" {
@@ -493,6 +498,78 @@ resource "google_service_account_iam_member" "bdb_sa_access" {
 }
 ```
 
-##### 
+##### GCS Access
+This is the compute instance in the second project, who has access to the GCS bucket, but does not have a public IP address. 
+
+```terraform
+resource "google_compute_instance" "gcs_access" {
+  project = module.project_vpc_2.project_id
+
+  machine_type              = "n1-standard-1"
+  name                      = "gcs-access"
+  zone                      = "europe-west1-b"
+  allow_stopping_for_update = true
+
+  boot_disk {
+    initialize_params {
+      image = data.google_compute_image.debian.self_link
+    }
+  }
+
+  network_interface {
+    subnetwork = google_compute_subnetwork.private_subnet_1.self_link
+  }
+
+  metadata = {
+    enable-oslogin = "TRUE"
+  }
+
+  tags = [
+    "private-access"
+  ]
+
+  service_account {
+    email = google_service_account.sa_gcs_access.email
+    scopes = [
+      "cloud-platform"
+    ]
+  }
+}
+```
+
+##### Firewall
+
+Given that it's not possible to configure firewall rules with Service Accounts cross-project, we have to use the IP range of the Bastion host.
+
+```terraform
+resource "google_compute_firewall" "private_ssh_access" {
+  project = module.project_vpc_2.project_id
+
+  name    = "private-ssh-access"
+  network = google_compute_network.private_vpc_2.self_link
+
+  allow {
+    protocol = "icmp"
+  }
+
+  allow {
+    protocol = "tcp"
+    ports    = ["22"]
+  }
+
+  enable_logging = true
+
+  target_tags = [
+    "private-access"
+  ]
+
+  source_ranges = [
+    "10.0.0.0/24"
+  ]
+
+}
+```
+
+
 
 
