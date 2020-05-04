@@ -1,5 +1,5 @@
 locals {
-  function_project_id = "function_project_${random_id.randomizer}"
+  function_project_id = "function_project_${random_id.randomizer.hex}"
 
   function_project_services = [
     "compute.googleapis.com",
