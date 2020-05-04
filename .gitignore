@@ -1,3 +1,6 @@
 *.iml
 **/.terraform/**
 **/.DS_Store
+
+*.tfstate**
+**/terraform.tfvars
