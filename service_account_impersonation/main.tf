@@ -43,16 +43,16 @@ resource "google_service_account" "project_creator" {
   display_name = "Project Creator"
 }
 
-resource "google_folder_iam_member" "folder_project_creator" {
-  count  = local.folder_id == null ? 0 : 1
-  folder = local.folder_id
+resource "google_organization_iam_member" "organization_project_creator" {
+  count  = local.organization_id == null ? 0 : 1
+  org_id = local.organization_id
   member = "serviceAccount:${google_service_account.project_creator.email}"
   role   = "roles/resourcemanager.projectCreator"
 }
 
-resource "google_organization_iam_member" "organization_project_creator" {
-  count  = local.organization_id == null ? 0 : 1
-  org_id = local.organization_id
+resource "google_folder_iam_member" "folder_project_creator" {
+  count  = local.folder_id == null ? 0 : 1
+  folder = local.folder_id
   member = "serviceAccount:${google_service_account.project_creator.email}"
   role   = "roles/resourcemanager.projectCreator"
 }
