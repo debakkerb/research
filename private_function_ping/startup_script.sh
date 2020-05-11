@@ -7,10 +7,8 @@ apt-get install -y apache2
 
 # Set HTML as start page
 echo "Setting startpage"
-cat <<EOF > /var/www/html/index.html
-<html><body><h1>Hello World</h1>
-<p>This page was created from a simple startup script.</p>
-</body></html>
+cat <<EOF > /var/www/html/index.xml
+<status><service name="service_one" status="HEALTHY" /><service name="service_two" status="DEGRADED" /></status>
 EOF
 
 # Restart Apache

@@ -3,11 +3,11 @@ locals {
     "compute.googleapis.com"
   ]
 
-  org_id    = var.organization_id == null ? null : "organizations/${var.organization_id}"
-  folder_id = var.folder_id == null ? null : "folders/${var.folder_id}"
+  org_id    = var.organization_id == null ? null : var.organization_id
+  folder_id = var.folder_id == null ? null : var.folder_id
 
-  host_project_id    = "ping_host_${random_id.randomizer.hex}"
-  service_project_id = "ping_host_${random_id.randomizer.hex}"
+  host_project_id    = "ping-host-${random_id.randomizer.hex}"
+  service_project_id = "ping-host-${random_id.randomizer.hex}"
 
   private_connector_cidr = "10.100.0.0/28"
 }
@@ -18,11 +18,13 @@ resource "random_id" "randomizer" {
 
 resource "google_project" "host_project" {
   name       = local.host_project_id
-  project_id = local.service_project_id
+  project_id = local.host_project_id
 
   org_id          = local.org_id
   folder_id       = local.folder_id
   billing_account = var.billing_account
+
+  depends_on = [google_organization_iam_member.xpn_admin]
 }
 
 resource "google_project_service" "host_project_services" {
@@ -58,6 +60,8 @@ resource "google_compute_network" "shared_vpc" {
   project                 = google_project.host_project.project_id
   name                    = "host-network"
   auto_create_subnetworks = false
+
+  depends_on = [google_project_service.host_project_services]
 }
 
 resource "google_compute_subnetwork" "vm_subnet" {
@@ -117,6 +121,10 @@ resource "google_compute_instance" "web_server" {
     email  = google_service_account.compute_service_account.email
     scopes = ["cloud-platform"]
   }
+
+  depends_on = [
+    google_project_service.host_project_services
+  ]
 }
 
 resource "google_compute_firewall" "vm_private_access" {

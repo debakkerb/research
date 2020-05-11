@@ -1,5 +1,5 @@
 locals {
-  function_project_id = "function_project_${random_id.randomizer.hex}"
+  function_project_id = "function-project-${random_id.randomizer.hex}"
 
   function_project_services = [
     "compute.googleapis.com",
@@ -26,6 +26,9 @@ resource "google_project_service" "function_project_services" {
 
   project = google_project.private_function_project.project_id
   service = each.value
+
+  disable_dependent_services = true
+  disable_on_destroy         = true
 }
 
 resource "google_compute_network" "private_function_network" {
@@ -33,6 +36,8 @@ resource "google_compute_network" "private_function_network" {
 
   name                    = "function-network"
   auto_create_subnetworks = false
+
+  depends_on = [google_project_service.function_project_services]
 }
 
 resource "google_compute_subnetwork" "private_function_subnet" {
@@ -51,6 +56,8 @@ resource "google_storage_bucket" "cloud_function_source_bucket" {
   versioning {
     enabled = true
   }
+
+  force_destroy = true
 }
 
 data "archive_file" "healthcheck_file" {
@@ -94,16 +101,18 @@ resource "google_cloudfunctions_function" "healthcheck" {
 
 resource "google_project_iam_member" "fnc_network_user" {
   project = google_project.private_function_project.project_id
-  member  = "serviceAccount:${google_project.private_function_project.number}@gcf-admin-robot.iam.gserviceaccount.com"
+  member  = "serviceAccount:service-${google_project.private_function_project.number}@gcf-admin-robot.iam.gserviceaccount.com"
   role    = "roles/compute.networkUser"
+
+  depends_on = [google_project_service.function_project_services]
 }
 
 resource "google_vpc_access_connector" "private_connector" {
   project       = google_project.private_function_project.project_id
-  name          = "private-connector"
+  name          = "connector"
   region        = "europe-west1"
   ip_cidr_range = local.private_connector_cidr
-  network       = google_compute_network.private_function_network.self_link
+  network       = google_compute_network.private_function_network.name
 }
 
 resource "google_cloud_scheduler_job" "scheduled_healthcheck_job" {
@@ -126,7 +135,7 @@ resource "google_cloud_scheduler_job" "scheduled_healthcheck_job" {
 
 resource "google_app_engine_application" "scheduler_app" {
   project     = google_project.private_function_project.project_id
-  location_id = "europe-west1"
+  location_id = "europe-west"
 }
 
 

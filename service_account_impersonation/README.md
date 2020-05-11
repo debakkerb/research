@@ -1,0 +1,5 @@
+# Service Account Impersonating
+
+When running Terraform pipelines in GCP, a service account has to be attached to the process.  When using Cloud Build, the main Cloud Build service account is used. It's not a great idea to have one service account orchestrating all your resources.  Partially because Terraform runs into performance issues when it has to manage a large number of resources.  Another reason is that one service account needs all the permissions to create resources, which is too big of a risk.
+
+As a solution, you can split your deployment in multiple focus areas and assign a focused service account to each individual focus area.  However, Cloud Build still uses the main service account to run its deployments, so you need to tell the platform that it has to use the specific service accounts for each individual focus area.  That's where the datablock `google_service_account_access_token` comes into play.

@@ -7,7 +7,7 @@ This can't be solved by adding a load balancer in front of the application, beca
 ## Architecture
 ![Cloud Function Healtcheck](./architecture/architecture.png)
 
-The Compute instance runs in a shared VPC and is not exposed publicly.  
+The Compute instance runs in a shared VPC and is not exposed publicly.  The Cloud Function can access the private IP address of the VM, through the Serverless VPC access tunnel that is put in place.
 
 ## Implementation
 ### Networks
