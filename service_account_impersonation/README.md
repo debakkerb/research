@@ -4,6 +4,9 @@ When running Terraform pipelines in GCP, a service account has to be attached to
 
 As a solution, you can split your deployment in multiple focus areas and assign a focused service account to each individual focus area.  However, Cloud Build still uses the main service account to run its deployments, so you need to tell the platform that it has to use the specific service accounts for each individual focus area.  That's where the datablock `google_service_account_access_token` comes into play.
 
+## Architecture
+![Service Account Impersonating](./architecture/architecture.png)
+
 ## Service Account
 Create the service account that will be responsible for the target action.  In this case, it's creating projects.  Depending on what value is provided, this member is created at organization or folder level.
 
