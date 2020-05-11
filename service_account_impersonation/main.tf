@@ -87,7 +87,6 @@ provider "google-beta" {
   access_token = data.google_service_account_access_token.project_creator_access_token.access_token
 }
 
-
 resource "google_project" "target_project" {
   provider            = google.impersonator
   name                = local.target_project_id

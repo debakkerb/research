@@ -11,3 +11,4 @@ This code deliberately doesn't use modules, to show all the resources that have 
 * [DNS Hub and Spoke](./dns_hub_spoke)
 * [Audit Sinks](./audit_sink)
 * [VPC SC](./vpc_sc)
+* [Impersonating Service Accounts for Build Pipelines](./service_account_impersonation)
