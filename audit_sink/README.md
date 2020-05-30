@@ -1,3 +1,20 @@
+# Log Sinks
+In GCP there is the possibility to configure log sinks in your organization.  The purpose is to extract logs, most of the times admin activity or data access logs.  Other filters can be configured, for example, extracting application logs from a PRD environment and storing it for longterm analysis.  Other use cases can be firewall logs or VPC flow logs, to analyse traffic entering your networks.
+
+This example creates an organization log sink, meaning that logs across the entire GCP organization are being picked up and stored inside sink.  However, sinks can be configured on organization, folder and project level.  For example, microservices deployed in a project, generates lots of logs.  These application logs can be extracted into a sink, to analyse application logs.  Logs are stored in both GCS and BigQuery.
+
+## Project
+
+```terraform
+locals {
+    
+}
+
+resource "
+
+
+```
+
 ```terraform
 module "audit_log_project" {
   source = "git@github.com:debakkerb/tf-modules//10_-_standalone/project"
