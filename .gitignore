@@ -5,3 +5,5 @@
 *.tfstate**
 **/terraform.tfvars
 **/healthcheck.zip
+
+**/credentials.txt
