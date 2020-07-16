@@ -26,6 +26,9 @@ resource "google_project_service" "enabled_service" {
   for_each = toset(local.project_services)
   project  = google_project.audit_sink_project.project_id
   service  = each.value
+
+  disable_dependent_services = true
+  disable_on_destroy = true
 }
 
 resource "google_resource_manager_lien" "audit_project_lien" {
