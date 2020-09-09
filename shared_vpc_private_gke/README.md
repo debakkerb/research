@@ -87,6 +87,37 @@ module "gke_host_project" {
 ### Service Projects
 
 ```terraform
+module "gke_svc_one" {
+  source  = "terraform-google-modules/project-factory/google"
+  version = "~> 9.0"
+
+  name                 = "${var.project_prefix}-svc-1"
+  random_project_id    = true
+  org_id               = var.organization_id
+  billing_account      = var.billing_account_id
+  folder_id            = var.folder_id
+  skip_gcloud_download = true
+
+  activate_apis = [
+    "container.googleapis.com"
+  ]
+}
+
+module "gke_svc_two" {
+  source  = "terraform-google-modules/project-factory/google"
+  version = "~> 9.0"
+
+  name                 = "${var.project_prefix}-svc-2"
+  random_project_id    = true
+  org_id               = var.organization_id
+  billing_account      = var.billing_account_id
+  folder_id            = var.folder_id
+  skip_gcloud_download = true
+
+  activate_apis = [
+    "container.googleapis.com"
+  ]
+}
 
 ```
 
