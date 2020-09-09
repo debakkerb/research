@@ -15,3 +15,4 @@
 variable "organization_id" {}
 variable "billing_account_id" {}
 variable "folder_id" {}
+variable "project_prefix" {}
