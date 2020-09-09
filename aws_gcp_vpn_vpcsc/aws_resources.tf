@@ -17,10 +17,20 @@ resource "aws_internet_gateway" "internet_gateway" {
 
 resource "aws_default_route_table" "public_internet_access" {
   default_route_table_id = aws_vpc.bastion_vpc.default_route_table_id
+
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.internet_gateway.id
   }
+
+  propagating_vgws = [
+    aws_vpn_gateway.vpn_gateway.id
+  ]
+}
+
+resource "aws_route_table_association" "default" {
+  route_table_id = aws_vpc.bastion_vpc.default_route_table_id
+  subnet_id      = aws_subnet.bastion_subnet.id
 }
 
 // Compute
@@ -73,3 +83,30 @@ resource "aws_instance" "bastion_host" {
 }
 
 // VPN Resources
+resource "aws_vpn_gateway" "vpn_gateway" {
+  vpc_id = aws_vpc.bastion_vpc.id
+}
+
+resource "aws_customer_gateway" "customer_gateway_one" {
+  bgp_asn    = google_compute_router.gcp_cr_gw.bgp[0].asn
+  ip_address = google_compute_ha_vpn_gateway.gcp_vpn_gateway.vpn_interfaces[0].ip_address
+  type       = "ipsec.1"
+}
+
+resource "aws_customer_gateway" "customer_gateway_two" {
+  bgp_asn    = google_compute_router.gcp_cr_gw.bgp[0].asn
+  ip_address = google_compute_ha_vpn_gateway.gcp_vpn_gateway.vpn_interfaces[1].ip_address
+  type       = "ipsec.1"
+}
+
+resource "aws_vpn_connection" "vpn_conn_one" {
+  customer_gateway_id = aws_customer_gateway.customer_gateway_one.id
+  vpn_gateway_id      = aws_vpn_gateway.vpn_gateway.id
+  type                = "ipsec.1"
+}
+
+resource "aws_vpn_connection" "vpn_conn_two" {
+  customer_gateway_id = aws_customer_gateway.customer_gateway_two.id
+  vpn_gateway_id      =  aws_vpn_gateway.vpn_gateway.id
+  type                = "ipsec.1"
+}
