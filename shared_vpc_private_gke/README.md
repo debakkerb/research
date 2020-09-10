@@ -460,10 +460,12 @@ resource "google_container_cluster" "gke_cluster" {
 
 #### Node Pool
 
+For the node pool, I chose a standard configuration.  The only things to highlight are the service account (yes, it has to be added to both the cluster and the node pool) and the fact that we use Sandbox nodes, as opposed to standard ones.
+
 ```terraform
 resource "google_container_node_pool" "gke_node_pool" {
   provider   = google-beta
-  project    = module.bdb_gke_svc_1.project_id
+  project    = module.gke_svc_one.project_id
   name       = "gke-fin-nodes"
   cluster    = google_container_cluster.gke_cluster.name
   location   = "europe-west1"
