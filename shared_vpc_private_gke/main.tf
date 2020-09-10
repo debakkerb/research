@@ -12,6 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+locals {
+  host_gke_robot_sa  = "service-${module.gke_host_project.project_number}@container-engine-robot.iam.gserviceaccount.com"
+  service_1_robot_sa = "service-${module.gke_svc_one.project_number}@container-engine-robot.iam.gserviceaccount.com"
+  service_2_robot_sa = "service-${module.gke_svc_two.project_number}@container-engine-robot.iam.gserviceaccount.com"
+
+  google_api_svc1_sa = "${module.gke_svc_one.project_number}@cloudservices.gserviceaccount.com"
+  google_api_svc2_sa = "${module.gke_svc_two.project_number}@cloudservices.gserviceaccount.com"
+
+  gke_operator_sa_roles = [
+    "roles/logging.logWriter",
+    "roles/monitoring.metricWriter",
+    "roles/monitoring.viewer",
+  ]
+}
+
 resource "random_id" "randomizer" {
   byte_length = 4
 }
