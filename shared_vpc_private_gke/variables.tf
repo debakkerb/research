@@ -15,4 +15,12 @@
 variable "organization_id" {}
 variable "billing_account_id" {}
 variable "folder_id" {}
-variable "project_prefix" {}
+
+variable "project_prefix" {
+  description = "Prefix to be used for the project names and IDs."
+}
+
+variable "network_name" {
+  description = "Name for the network and subnetworks."
+  default     = "gke-tst-nw"
+}

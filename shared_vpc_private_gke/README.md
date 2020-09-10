@@ -118,6 +118,75 @@ module "gke_svc_two" {
     "container.googleapis.com"
   ]
 }
+```
+
+The Container-API has to be enabled on both the host and service projects.  This will also cause the following APIs to be enabled:
+
+```
+bigquery.googleapis.com           
+bigquerystorage.googleapis.com
+compute.googleapis.com            
+containerregistry.googleapis.com
+iam.googleapis.com                
+iamcredentials.googleapis.com 
+monitoring.googleapis.com        
+oslogin.googleapis.com            
+pubsub.googleapis.com            
+storage-api.googleapis.com
+```
+### Network
+
+As show on the diagram, we will create one host network and two subnetworks.  Each subnetwork will be shared with one service project.  As our nodes won't have any public IP addresses, we enable Private Google Access on the subnet (`private_ip_google_access = true`).  To keep it simple, the subnets are located in two regions, `europe-west1` and `europe-west2`.  
+
+//TODO: Add more information around IP address management.
+
+```terraform
+# Host Network
+resource "google_compute_network" "gke_host_network" {
+  project                 = module.gke_host_project.project_id
+  name                    = "${var.network_name}-${random_id.randomizer.hex}"
+  auto_create_subnetworks = false
+  description             = "Host Network for GKE clusters"
+}
+
+# Subnetworks
+resource "google_compute_subnetwork" "gke_host_subnet_1" {
+  project                  = module.gke_host_project.project_id
+  ip_cidr_range            = "10.0.4.0/22"
+  name                     = "${var.network_name}-sn-euw1"
+  network                  = google_compute_network.gke_host_network.self_link
+  region                   = "europe-west1"
+  private_ip_google_access = true
+
+  secondary_ip_range {
+    ip_cidr_range = "10.4.0.0/14"
+    range_name    = "gke-pod-euw1-secondary"
+  }
+
+  secondary_ip_range {
+    ip_cidr_range = "10.0.32.0/20"
+    range_name    = "gke-svc-euw1-secondary"
+  }
+}
+
+resource "google_compute_subnetwork" "gke_host_subnet_2" {
+  project                  = module.gke_host_project.project_id
+  name                     = "${var.network_name}-sn-euw2"
+  network                  = google_compute_network.gke_host_network.self_link
+  ip_cidr_range            = "172.16.4.0/22"
+  region                   = "europe-west2"
+  private_ip_google_access = true
+
+  secondary_ip_range {
+    ip_cidr_range = "172.20.0.0/14"
+    range_name    = "gke-pod-euw2-secondary"
+  }
+
+  secondary_ip_range {
+    ip_cidr_range = "172.16.16.0/20"
+    range_name    = "gke-service-euw2-secondary"
+  }
+}
 
 ```
 
