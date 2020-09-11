@@ -7,7 +7,7 @@ We are not going to use any Terraform modules, as it's difficult to understand w
 There is already a [great article](https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-shared-vpc) out there that describes all the individual steps in more detail.  However, it uses `gcloud`-commands and it doesn't elaborate on some steps as much as I would like to. 
 
 ## Components
-![Architecture](./architecture)
+![Architecture](./architecture/gke_shared_vpc_arch.png)
 
 The following components will be created as part of this article:
 - Host project
@@ -17,7 +17,7 @@ The following components will be created as part of this article:
 - GKE cluster (2)
 
 ## Service Account
-Normally, the GKE cluster runs with the default Compute service account.  Because this service account has very open permissions (Editor-role), I recommend teams to remove those permissions.
+Normally, the GKE cluster runs with the default Compute service account.  Because this service account has very open permissions (Editor-role), I recommend to remove those permissions, as it violates the principle of least privilege.
 
 This can be done via an organization policy:
 
@@ -157,7 +157,7 @@ This probably mandates an entire book (or at least several chapters in a book), 
 **Example**
 
 - 500 nodes: /23, which gives you 508 IP addresses (4 are reserved).
-- 500 x 256 (110 pods per node) = 128.000 IP addresses for the secondary range.  Which means we need a **/15** for the Pod IP ranges.
+- 500 x 256 (110 pods per node, /24 per node) = 128.000 IP addresses for the secondary range.  Which means we need a **/15** for the Pod IP ranges.
 - Services: If you want to run 1500 services, you need to provision a **/21** address block as secondary range.
 
 As you can see, these address blocks are quite large.  You need to do your due diligence to ensure that you don't overprovision or underprovision.   You can always increase the IP range of a subnet or secondary alias, but changing it completely will result in the subnet to be recreated.
