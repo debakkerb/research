@@ -5,5 +5,7 @@
 *.tfstate**
 **/terraform.tfvars
 **/healthcheck.zip
+**/backend.tf
+**/.terraform.lock.hcl
 
 **/credentials.txt
