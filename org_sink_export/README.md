@@ -1,2 +1,0 @@
-# Export Sinks
-In GCP it is possible (and recommended!) to configure export sinks in your organisation, on multiple levels (org, folder and projects).  The way it works is that you configure a filter and, depending on where and how you define the export sink, it will traverse the hierarchy to bring out the logs
