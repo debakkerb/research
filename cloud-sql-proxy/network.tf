@@ -68,6 +68,7 @@ resource "google_compute_firewall" "iap_ingress_firewall" {
   allow {
     protocol = "tcp"
     ports    = ["5432", "22"]
+
   }
 
   source_ranges = [
@@ -77,5 +78,45 @@ resource "google_compute_firewall" "iap_ingress_firewall" {
   target_service_accounts = [
     google_service_account.sql_proxy_service_account.email
   ]
+}
+
+// External access
+resource "google_compute_router" "router" {
+  count = var.block_egress ? 0 : 1
+
+  project = module.cloud_sql_proxy_host_project.project_id
+  name    = "external-access-router"
+  network = google_compute_network.host_network.self_link
+  region  = var.region
+
+  bgp {
+    asn = 64514
+  }
+}
+
+resource "google_compute_router_nat" "nat" {
+  count = var.block_egress ? 0 : 1
+
+  project                            = module.cloud_sql_proxy_host_project.project_id
+  name                               = "external-access-nat"
+  router                             = google_compute_router.router[0].name
+  region                             = var.region
+  nat_ip_allocate_option             = "AUTO_ONLY"
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+
+  log_config {
+    enable = true
+    filter = "ERRORS_ONLY"
+  }
+}
+
+resource "google_compute_route" "external_access" {
+  count            = var.block_egress ? 0 : 1
+
+  project          = module.cloud_sql_proxy_host_project.project_id
+  dest_range       = "0.0.0.0/0"
+  name             = "external-access"
+  network          = google_compute_network.host_network.name
+  next_hop_gateway = "global/gateways/default-internet-gateway"
 }
 

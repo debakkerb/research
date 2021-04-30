@@ -28,6 +28,10 @@ resource "google_compute_instance" "proxy_instance" {
   description               = "Cloud SQL proxy"
   deletion_protection       = false
 
+  metadata = {
+    startup-script = local_file.sql_proxy_install_script.content
+  }
+
   shielded_instance_config {
     enable_integrity_monitoring = true
     enable_secure_boot          = true
@@ -54,7 +58,8 @@ resource "google_compute_instance" "proxy_instance" {
 
   depends_on = [
     google_compute_shared_vpc_host_project.host_project,
-    google_compute_shared_vpc_service_project.service_project
+    google_compute_shared_vpc_service_project.service_project,
+    null_resource.chmod_execute_sql_install_script
   ]
 }
 
@@ -62,4 +67,23 @@ resource "google_compute_project_metadata_item" "oslogin" {
   project = module.cloud_sql_proxy_service_project.project_id
   key     = "oslogin-enabled"
   value   = "TRUE"
+}
+
+data "template_file" "sql_proxy_install_script_tmpl" {
+  template = file("${path.module}/scripts/cloud_sql_proxy_install.sh.tpl")
+  vars = {
+    instance_connection_name = google_sql_database_instance.private_sql_instance.connection_name
+    cloud_sql_proxy_version  = var.cloud_sql_proxy_version
+  }
+}
+
+resource "local_file" "sql_proxy_install_script" {
+  content  = data.template_file.sql_proxy_install_script_tmpl.rendered
+  filename = "${path.module}/scripts/cloud_sql_proxy_install.sh"
+}
+
+resource "null_resource" "chmod_execute_sql_install_script" {
+  provisioner "local-exec" {
+    command = "chmod +x ${local_file.sql_proxy_install_script.filename}"
+  }
 }

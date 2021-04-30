@@ -28,12 +28,18 @@ variable "zone" {
   default = "europe-west1-b"
 }
 
-variable "initial_run" {
+variable "block_egress" {
   description = "The compute instance requires external access to download patches and scripts. Once the VM is installed, set this to false, so the Cloud NAT and Router are deleted."
   default     = true
+  type        = bool
 }
 
 variable "subnet_cidr_range" {
   description = "CIDR block for the subnet"
-  default = "10.0.0.0/24"
+  default     = "10.0.0.0/24"
+}
+
+variable "cloud_sql_proxy_version" {
+  type    = string
+  default = "v1.21.0"
 }

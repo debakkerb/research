@@ -30,6 +30,7 @@ resource "google_storage_bucket" "terraform_state_bucket" {
   project                     = module.cloud_sql_proxy_host_project.project_id
   name                        = "${var.prefix}-tf-state"
   uniform_bucket_level_access = true
+  force_destroy               = true
 
   versioning {
     enabled = true

@@ -26,8 +26,8 @@ module "cloud_sql_proxy_host_project" {
 
   activate_apis = [
     "storage.googleapis.com",
-    "sqladmin.googleapis.com",
     "compute.googleapis.com",
+    "servicenetworking.googleapis.com"
   ]
 }
 
@@ -43,5 +43,9 @@ module "cloud_sql_proxy_service_project" {
 
   activate_apis = [
     "compute.googleapis.com",
+    "sqladmin.googleapis.com",
+    "servicenetworking.googleapis.com",
+    "logging.googleapis.com",
+    "secretmanager.googleapis.com"
   ]
 }
