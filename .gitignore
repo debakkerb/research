@@ -9,3 +9,5 @@
 **/.terraform.lock.hcl
 
 **/credentials.txt
+
+# Generated SSH files

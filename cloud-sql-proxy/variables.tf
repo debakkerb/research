@@ -30,7 +30,7 @@ variable "zone" {
 
 variable "block_egress" {
   description = "The compute instance requires external access to download patches and scripts. Once the VM is installed, set this to false, so the Cloud NAT and Router are deleted."
-  default     = true
+  default     = false
   type        = bool
 }
 
