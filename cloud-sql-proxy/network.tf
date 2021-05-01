@@ -106,7 +106,7 @@ resource "google_compute_router" "router" {
   count = var.block_egress ? 0 : 1
 
   project = module.cloud_sql_proxy_host_project.project_id
-  name    = "external-access-router"
+  name    = "proxy-ext-access-router"
   network = google_compute_network.host_network.self_link
   region  = var.region
 
@@ -119,7 +119,7 @@ resource "google_compute_router_nat" "nat" {
   count = var.block_egress ? 0 : 1
 
   project                            = module.cloud_sql_proxy_host_project.project_id
-  name                               = "external-access-nat"
+  name                               = "proxy-ext-access-nat"
   router                             = google_compute_router.router[0].name
   region                             = var.region
   nat_ip_allocate_option             = "AUTO_ONLY"
@@ -136,7 +136,7 @@ resource "google_compute_route" "external_access" {
 
   project          = module.cloud_sql_proxy_host_project.project_id
   dest_range       = "0.0.0.0/0"
-  name             = "external-access"
+  name             = "proxy-external-access"
   network          = google_compute_network.host_network.name
   next_hop_gateway = "global/gateways/default-internet-gateway"
 }
