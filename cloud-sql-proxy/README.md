@@ -71,3 +71,20 @@ Most of the outputs are commands that can be run to establish connectivity towar
 | host_network_project_id      | The project ID of the host project.                           |
 | service_network_project_id   | The project ID of the service project.                        |
 | retrieve_db_password         | Command to retrieve the password for the database.            |
+
+## Resources
+### cloud_sql.tf
+This file contains all the resources to create the Cloud SQL instance with a private IP address.  
+
+| Resource                                                               | Purpose                                                                                                                                                                                                                                                                                 |
+|------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| google_compute_global_address                                          | IP address range for the [Private Services Access](https://cloud.google.com/vpc/docs/configure-private-services-access).                                                                                                                                                                |
+| google_service_networking_connection                                   | Private Services Access connection.                                                                                                                                                                                                                                                     |
+| google_sql_database_instance                                           | The SQL database instance. Even though the instance is created in the service project, the network from the host project should be used for the `ip_configuration`.  Because `ipv4_enabled` is set to false, no public IP address is assigned.                                          |
+| google_sql_database                                                    | The database that is created in the DB instance.                                                                                                                                                                                                                                        |
+| google_sql_user                                                        | User created to access the database.  For Postgres, IAM access can be used.  However, this has implications for the Cloud SQL proxy, so I chose to generate a DB user instead.                                                                                                          |
+| random_password                                                        | Generated password for the SQL user.                                                                                                                                                                                                                                                    |
+| google_secret_manager_secret and  google_secret_manager_secret_version | Secret Manager secret to store the password and make sure other identities and GCP resources can access it.                                                                                                                                                                             |
+| google_secret_manager_secret_iam_member                                | To grant access to the secret to the identity referenced in the variables, the role  `roles/secretmanager.secretAccessor` is granted *on the secret* itself.  If this is granted at project level, identities gain access to **all** the secrets in that project, which is less secure. |
+
+### 
