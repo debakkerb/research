@@ -11,3 +11,4 @@
 **/credentials.txt
 
 # Generated SSH files
+cloud_sql_proxy_install.sh
