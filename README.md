@@ -6,3 +6,6 @@ This code deliberately doesn't use modules, to show all the resources that have 
 
 ## Scenarios
 
+* [Cloud SQL proxy on a VM, via IAP tunnel](./cloud-sql-proxy)
+
+
