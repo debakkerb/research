@@ -1,5 +1,7 @@
 # Cloud SQL Proxy
 
+## Architecture
+
 In order to connect to a Cloud SQL instance with a private IP address, you can use the [Cloud SQL proxy](https://github.com/GoogleCloudPlatform/cloudsql-proxy).  It's not possible to run this on your local machine, as the proxy requires access to the private IP address.  To solve that, you can run it on a VM and use that as a jump box to connect to the Cloud SQL instance.
 
 ![Cloud SQL Proxy](diagrams/cloud_sql_proxy.png)
@@ -7,6 +9,8 @@ In order to connect to a Cloud SQL instance with a private IP address, you can u
 To make this example more realistic, we run the Cloud SQL instance in a Shared VPC, as this is normally the setup most Enterprise customers have configured. This way, we can clearly share what resources are running in which project (host and service).  
 
 ## How To Run
+
+To be able to run this example, you need the necessary permissions to create projects and a shared vpc.
 
 ### Create
 
@@ -36,7 +40,7 @@ This will create all the resources, depicted in the diagram.  It will also creat
 
 To access the environment, open two terminal windows and run the following commands:
 1. IAP Tunnel: `$(terraform output -json | jq -r .start_iap_tunnel.value)`
-2. PSQL: `terraform tf output -json | jq -r .sql_client_command.value | pbcopy`
+2. PSQL: `terraform output -json | jq -r .sql_client_command.value | pbcopy`
 
 Because of the double quotes, the command is copied to your cache and you can paste it in the terminal window. To retrieve the password for the database, run `$(terraform output -json | jq -r .retrieve_db_password.value) | pbcopy` and copy/paste it where you ran the `PSQL`-command (second terminal).
 
@@ -46,6 +50,24 @@ To destroy the environment, remove `backend.tf` and re-initialise terraform agai
 
 ## Variables
 
+| Variable                | Type   | Default        | Description                                                                                                                                                                                                                                                                               |
+|-------------------------|--------|----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| region                  | string | europe-west1   | Default region for all resources.                                                                                                                                                                                                                                                         |
+| zone                    | string | europe-west1-b | Default zone for all resources.                                                                                                                                                                                                                                                           |
+| block_egress            | bool   | false          | The VM only gets a private IP address, so it needs routing to the public internet to install all updated packages and the Cloud SQL proxy.  Once everything is created, you can delete those resources by setting this value to `true` and running `terraform apply -auto-approve` again. |
+| block_ssh               | bool   | true           | By default, SSH access is blocked.  If you need access to the VM, set this value to false so you can create the necessary firewall rules.                                                                                                                                                 |
+| subnet_cidr_range       | string | 10.0.0.0/24    | The CIDR block for the subnet where the VM is created.                                                                                                                                                                                                                                    |
+| cloud_sql_proxy_version | string | v1.21.0        | The version of the Cloud SQL proxy.                                                                                                                                                                                                                                                      |
+## Outputs
 
+Most of the outputs are commands that can be run to establish connectivity towards the Cloud SQL instance.  You can run these in a shell, via `$(terraform output -json | jq -r .OUTPUT_VAR_NAME.value`, replacing `OUTPUT_VAR_NAME` with the name of the output.
 
-## Resources
+| Name                         | Description                                                   |
+|------------------------------|---------------------------------------------------------------|
+| start_ssh_tunnel             | Command to start an SSH connection to the Cloud SQL proxy VM. |
+| sql_instance_connection_name | The connection name for the Cloud SQL instance.               |
+| start_iap_tunnel             | Command to open a TCP IAP tunnel to the VM, on port 5432.     |
+| sql_client_command           | PSQL command to connect to the database, via the proxy.       |
+| host_network_project_id      | The project ID of the host project.                           |
+| service_network_project_id   | The project ID of the service project.                        |
+| retrieve_db_password         | Command to retrieve the password for the database.            |
