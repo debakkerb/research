@@ -13,3 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+output "host_project_id" {
+  value = module.host_project.project_id
+}
+
+output "service_project_id" {
+  value = module.service_project.project_id
+}
+
+output "network_selflink" {
+  value = google_compute_network.default.self_link
+}
+
+output "subnetwork_name" {
+  value = google_compute_subnetwork.default.name
+}

@@ -13,3 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+module "shared_vpc_a" {
+  source = "./modules/shared_vpc"
+
+  billing_account_id = var.billing_account_id
+  organization_id    = var.organization_id
+  parent_folder_id   = var.parent_folder_id
+
+  prefix            = "rsrch"
+  suffix            = "a"
+  subnet_cidr_block = "10.0.0.0/16"
+}
+
+module "shared_vpc_b" {
+  source = "./modules/shared_vpc"
+
+  billing_account_id = var.billing_account_id
+  organization_id    = var.organization_id
+  parent_folder_id   = var.parent_folder_id
+
+  prefix            = "rsrch"
+  suffix            = "b"
+  subnet_cidr_block = "10.1.0.0/16"
+}

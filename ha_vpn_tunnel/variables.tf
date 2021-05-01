@@ -27,3 +27,7 @@ variable "region" {
 variable "zone" {
   default = "europe-west1-b"
 }
+
+variable "cidr_range_a" {
+  default = "10.0.0.0/16"
+}
