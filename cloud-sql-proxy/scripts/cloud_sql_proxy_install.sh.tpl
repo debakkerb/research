@@ -28,8 +28,8 @@ sudo apt-get install -y wget curl
 
 if ! [ -e "/usr/sbin/google-fluentd" ]; then
   echo "SQL Proxy Startup - Installing GCP Logging agent"
-  curl -sSO https://dl.google.com/cloudagents/install-logging-agent.sh
-  bash install-logging-agent.sh
+  curl -sSO https://dl.google.com/cloudagents/add-logging-agent-repo.sh
+  sudo bash add-logging-agent-repo.sh --also-install
 fi
 
 echo "Cloud SQL Proxy Startup - Downloading the Cloud SQL proxy script ..."
@@ -58,7 +58,7 @@ After=networking.service
 [Service]
 Type=simple
 WorkingDirectory=/usr/local/bin
-ExecStart=/usr/local/bin/cloud_sql_proxy -dir=/var/run/cloud-sql-proxy -instances=${instance_connection_name}=tcp:0.0.0.0:5432 -enable_iam_login
+ExecStart=/usr/local/bin/cloud_sql_proxy -dir=/var/run/cloud-sql-proxy -instances=${instance_connection_name}=tcp:0.0.0.0:5432 -structured_logs -log_debug_stdout=true
 Restart=always
 StandardOutput=journal
 User=root
