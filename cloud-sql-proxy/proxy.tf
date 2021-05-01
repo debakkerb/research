@@ -22,7 +22,7 @@ data "google_compute_image" "debian" {
 resource "google_compute_instance" "proxy_instance" {
   project                   = module.cloud_sql_proxy_service_project.project_id
   machine_type              = "n1-standard-1"
-  name                      = "sql-proxy"
+  name                      = "${var.prefix}-sql-proxy"
   zone                      = var.zone
   allow_stopping_for_update = true
   description               = "Cloud SQL proxy"
@@ -53,8 +53,6 @@ resource "google_compute_instance" "proxy_instance" {
     email  = google_service_account.sql_proxy_service_account.email
     scopes = ["cloud-platform"]
   }
-
-  tags = ["sql-proxy"]
 
   depends_on = [
     google_compute_shared_vpc_host_project.host_project,
