@@ -61,11 +61,6 @@ resource "google_sql_database_instance" "private_sql_instance" {
       require_ssl     = true
       ipv4_enabled    = false
     }
-
-    database_flags {
-      name  = "cloudsql.iam_authentication"
-      value = "on"
-    }
   }
 
   depends_on = [

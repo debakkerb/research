@@ -37,3 +37,9 @@ resource "google_project_iam_member" "cloud_sql_user" {
   member  = "serviceAccount:${google_service_account.sql_proxy_service_account.email}"
   role    = "roles/cloudsql.instanceUser"
 }
+
+resource "google_project_iam_member" "cloud_sql_admin" {
+  project = module.cloud_sql_proxy_service_project.project_id
+  member  = "serviceAccount:${google_service_account.sql_proxy_service_account.email}"
+  role    = "roles/cloudsql.admin"
+}
