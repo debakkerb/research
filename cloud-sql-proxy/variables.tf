@@ -34,6 +34,12 @@ variable "block_egress" {
   type        = bool
 }
 
+variable "block_ssh" {
+  description = "Block SSH access to the VM.  Enabled by default."
+  default     = true
+  type        = bool
+}
+
 variable "subnet_cidr_range" {
   description = "CIDR block for the subnet"
   default     = "10.0.0.0/24"

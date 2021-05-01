@@ -67,8 +67,29 @@ resource "google_compute_firewall" "iap_ingress_firewall" {
 
   allow {
     protocol = "tcp"
-    ports    = ["5432", "22"]
+    ports    = ["5432"]
 
+  }
+
+  source_ranges = [
+    "35.235.240.0/20"
+  ]
+
+  target_service_accounts = [
+    google_service_account.sql_proxy_service_account.email
+  ]
+}
+
+resource "google_compute_firewall" "ssh_ingress_firewall" {
+  count     = var.block_ssh ? 0 : 1
+  project   = module.cloud_sql_proxy_host_project.project_id
+  name      = "allow-ssh-ingress"
+  network   = google_compute_network.host_network.self_link
+  direction = "INGRESS"
+
+  allow {
+    protocol = "tcp"
+    ports    = ["22"]
   }
 
   source_ranges = [
@@ -111,7 +132,7 @@ resource "google_compute_router_nat" "nat" {
 }
 
 resource "google_compute_route" "external_access" {
-  count            = var.block_egress ? 0 : 1
+  count = var.block_egress ? 0 : 1
 
   project          = module.cloud_sql_proxy_host_project.project_id
   dest_range       = "0.0.0.0/0"

@@ -20,26 +20,14 @@ resource "google_service_account" "sql_proxy_service_account" {
   description = "Service account, attached to the VM running the SQL proxy."
 }
 
-resource "google_service_account_iam_member" "sql_proxy_sa_access" {
-  member             = "user:${var.identity}"
-  role               = "roles/iam.serviceAccountUser"
-  service_account_id = google_service_account.sql_proxy_service_account.id
-}
-
 resource "google_project_iam_member" "id_iap_access" {
   project = module.cloud_sql_proxy_service_project.project_id
   member  = "user:${var.identity}"
   role    = "roles/iap.tunnelResourceAccessor"
 }
 
-resource "google_project_iam_member" "cloud_sql_user" {
-  project = module.cloud_sql_proxy_service_project.project_id
-  member  = "serviceAccount:${google_service_account.sql_proxy_service_account.email}"
-  role    = "roles/cloudsql.instanceUser"
-}
-
 resource "google_project_iam_member" "cloud_sql_admin" {
   project = module.cloud_sql_proxy_service_project.project_id
   member  = "serviceAccount:${google_service_account.sql_proxy_service_account.email}"
-  role    = "roles/cloudsql.admin"
+  role    = "roles/cloudsql.client"
 }

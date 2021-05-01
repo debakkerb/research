@@ -37,3 +37,7 @@ output "host_network_project_id" {
 output "service_network_project_id" {
   value = module.cloud_sql_proxy_service_project.project_id
 }
+
+output "retrieve_db_password" {
+  value = "gcloud secrets versions access ${google_secret_manager_secret_version.sql_db_user_password.id} --secret ${google_secret_manager_secret.sql_db_user_password.id}"
+}
