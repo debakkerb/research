@@ -19,7 +19,7 @@ variable "parent_folder_id" {}
 variable "billing_account_id" {}
 variable "prefix" {}
 variable "suffix" {}
+variable "subnet_cidr_block" {}
 variable "region" {
   default = "europe-west1"
 }
-variable "subnet_cidr_block" {}
