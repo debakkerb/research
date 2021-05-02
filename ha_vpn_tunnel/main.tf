@@ -13,26 +13,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-data "template_file" "backend" {
-  template = file("${path.module}/templates/backend.tf.tmpl")
-  vars = {
-    bucket_name = google_storage_bucket.terraform_state_bucket.name
-  }
-}
-
-resource "local_file" "backend" {
-  content  = data.template_file.backend.rendered
-  filename = "${path.module}/backend.tf"
-}
-
-resource "google_storage_bucket" "terraform_state_bucket" {
-  project                     = module.cloud_sql_proxy_host_project.project_id
-  name                        = "${var.prefix}-tf-state"
-  uniform_bucket_level_access = true
-  force_destroy               = true
-
-  versioning {
-    enabled = true
-  }
-}
