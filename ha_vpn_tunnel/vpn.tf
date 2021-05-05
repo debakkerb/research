@@ -13,17 +13,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-variable "organization_id" {}
-variable "parent_folder_id" {}
-variable "billing_account_id" {}
-variable "prefix" {}
-variable "suffix" {}
-variable "subnet_cidr_block_region_one" {}
-variable "subnet_cidr_block_region_two" {}
-variable "region_one" {
-  default = "europe-west1"
-}
-variable "region_two" {
-  default = "europe-west2"
-}

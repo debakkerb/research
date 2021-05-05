@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-variable "organization_id" {}
-variable "parent_folder_id" {}
-variable "billing_account_id" {}
-variable "prefix" {}
-variable "suffix" {}
-variable "subnet_cidr_block_region_one" {}
-variable "subnet_cidr_block_region_two" {}
-variable "region_one" {
-  default = "europe-west1"
+output "instance_name" {
+  value = google_compute_instance.default.name
 }
-variable "region_two" {
-  default = "europe-west2"
+
+output "vm_identity_email" {
+  value = google_service_account.instance_identity.email
+}
+
+output "vm_identity_id" {
+  value = google_service_account.instance_identity.id
 }

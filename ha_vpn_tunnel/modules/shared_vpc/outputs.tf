@@ -26,6 +26,18 @@ output "network_selflink" {
   value = google_compute_network.default.self_link
 }
 
-output "subnetwork_name" {
-  value = google_compute_subnetwork.default.name
+output "subnet_one_selflink" {
+  value = google_compute_subnetwork.region_one.self_link
+}
+
+output "subnet_two_selflink" {
+  value = google_compute_subnetwork.region_two.self_link
+}
+
+output "subnet_one_name" {
+  value = google_compute_subnetwork.region_one.name
+}
+
+output "subnet_two_name" {
+  value = google_compute_subnetwork.region_two.name
 }
