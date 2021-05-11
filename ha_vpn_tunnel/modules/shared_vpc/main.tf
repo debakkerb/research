@@ -52,12 +52,27 @@ resource "google_compute_network" "default" {
   description                     = "Host network"
 }
 
-resource "google_compute_subnetwork" "default" {
+resource "google_compute_subnetwork" "region_one" {
   project                  = module.host_project.project_id
-  ip_cidr_range            = var.subnet_cidr_block
-  name                     = "${var.prefix}-snw-${var.suffix}"
+  ip_cidr_range            = var.subnet_cidr_block_region_one
+  name                     = "${var.prefix}-snw-${var.suffix}-one"
   network                  = google_compute_network.default.self_link
-  region                   = var.region
+  region                   = var.region_one
+  private_ip_google_access = true
+
+  log_config {
+    aggregation_interval = "INTERVAL_10_MIN"
+    flow_sampling        = 0.5
+    metadata             = "INCLUDE_ALL_METADATA"
+  }
+}
+
+resource "google_compute_subnetwork" "region_two" {
+  project                  = module.host_project.project_id
+  ip_cidr_range            = var.subnet_cidr_block_region_two
+  name                     = "${var.prefix}-snw-${var.suffix}-one"
+  network                  = google_compute_network.default.self_link
+  region                   = var.region_two
   private_ip_google_access = true
 
   log_config {
@@ -72,7 +87,8 @@ resource "google_compute_shared_vpc_host_project" "default" {
 
   depends_on = [
     google_compute_network.default,
-    google_compute_subnetwork.default
+    google_compute_subnetwork.region_one,
+    google_compute_subnetwork.region_two
   ]
 }
 
@@ -82,7 +98,8 @@ resource "google_compute_shared_vpc_service_project" "default" {
 
   depends_on = [
     google_compute_network.default,
-    google_compute_subnetwork.default,
+    google_compute_subnetwork.region_one,
+    google_compute_subnetwork.region_two,
     google_compute_shared_vpc_host_project.default
   ]
 }

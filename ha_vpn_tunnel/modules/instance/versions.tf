@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-variable "organization_id" {}
-variable "parent_folder_id" {}
-variable "billing_account_id" {}
-variable "prefix" {}
-variable "suffix" {}
-variable "subnet_cidr_block_region_one" {}
-variable "subnet_cidr_block_region_two" {}
-variable "region_one" {
-  default = "europe-west1"
-}
-variable "region_two" {
-  default = "europe-west2"
+terraform {
+  required_version = ">= 0.15"
+
+  required_providers {
+    google = {
+      source = "hashicorp/google"
+      version = ">= 3.66"
+    }
+
+    google-beta = {
+      source = "hashicorp/google-beta"
+      version = ">= 3.66"
+    }
+  }
 }

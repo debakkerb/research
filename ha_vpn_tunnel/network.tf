@@ -21,9 +21,10 @@ module "shared_vpc_a" {
   organization_id    = var.organization_id
   parent_folder_id   = var.parent_folder_id
 
-  prefix            = "rsrch"
-  suffix            = "a"
-  subnet_cidr_block = "10.0.0.0/16"
+  prefix                       = "rsrch"
+  suffix                       = "a"
+  subnet_cidr_block_region_one = "10.0.0.0/16"
+  subnet_cidr_block_region_two = "10.100.0.0/16"
 }
 
 module "shared_vpc_b" {
@@ -33,7 +34,8 @@ module "shared_vpc_b" {
   organization_id    = var.organization_id
   parent_folder_id   = var.parent_folder_id
 
-  prefix            = "rsrch"
-  suffix            = "b"
-  subnet_cidr_block = "10.1.0.0/16"
+  prefix                       = "rsrch"
+  suffix                       = "b"
+  subnet_cidr_block_region_one = "10.1.0.0/16"
+  subnet_cidr_block_region_two = "10.200.0.0/16"
 }

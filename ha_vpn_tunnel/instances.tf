@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-variable "organization_id" {}
-variable "parent_folder_id" {}
-variable "billing_account_id" {}
-variable "prefix" {}
-variable "suffix" {}
-variable "subnet_cidr_block_region_one" {}
-variable "subnet_cidr_block_region_two" {}
-variable "region_one" {
-  default = "europe-west1"
+module "instance_network_a" {
+  source = "./modules/instance"
+
+  prefix          = var.prefix
+  suffix          = "a"
+  project_id      = module.shared_vpc_a.service_project_id
+  subnet_selflink = module.shared_vpc_a.subnet_one_selflink
 }
-variable "region_two" {
-  default = "europe-west2"
+
+module "instance_network_b" {
+  source = "./modules/instance"
+
+  prefix          = var.prefix
+  suffix          = "b"
+  project_id      = module.shared_vpc_b.service_project_id
+  subnet_selflink = module.shared_vpc_b.subnet_one_selflink
 }

@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 
-variable "organization_id" {}
-variable "parent_folder_id" {}
-variable "billing_account_id" {}
+variable "project_id" {}
 variable "prefix" {}
 variable "suffix" {}
-variable "subnet_cidr_block_region_one" {}
-variable "subnet_cidr_block_region_two" {}
-variable "region_one" {
-  default = "europe-west1"
-}
-variable "region_two" {
-  default = "europe-west2"
+variable "subnet_selflink" {}
+variable "zone" {
+  default = "europe-west1-b"
+  type    = string
 }
