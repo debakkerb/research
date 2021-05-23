@@ -33,9 +33,28 @@ module "bootstrap" {
   billing_account   = var.billing_account_id
 }
 
-resource "google_service_account" "orchestrator" {
-  project      = module.bootstrap.project_id
-  account_id   = "${local.prefix}orchestrator"
-  description  = "Service account to be used by CI/CD pipelines."
-  display_name = "Orchestrator"
+resource "google_storage_bucket" "terraform_state_bucket" {
+  project                     = module.bootstrap.project_id
+  name                        = "${local.prefix}tf-state"
+  force_destroy               = true
+  uniform_bucket_level_access = true
+  location                    = var.region
+
+  versioning {
+    enabled = true
+  }
+}
+
+data "template_file" "backend" {
+  template = file("${path.module}/backend.tf.tpl")
+  vars = {
+    gcs_bucket_tf_state             = google_storage_bucket.terraform_state_bucket.name
+    tf_state_prefix                 = "terraform/state/bootstrap"
+    bootstrap_service_account_email = google_service_account.orchestrator.email
+  }
+}
+
+resource "local_file" "backend" {
+  content  = data.template_file.backend.rendered
+  filename = "${path.module}/backend.tf"
 }

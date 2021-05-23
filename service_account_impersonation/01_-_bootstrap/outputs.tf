@@ -13,3 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+output "region" {
+  value = var.region
+}
+
+output "zone" {
+  value = var.zone
+}
+
+output "billing_account_id" {
+  value = var.billing_account_id
+}
