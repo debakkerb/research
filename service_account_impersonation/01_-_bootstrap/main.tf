@@ -54,7 +54,7 @@ data "template_file" "backend" {
   }
 }
 
-resource "local_file" "backend" {
+resource "local_file" "bootstrap_backend" {
   content  = data.template_file.backend.rendered
   filename = "${path.module}/backend.tf"
 }
