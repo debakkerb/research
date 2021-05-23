@@ -7,6 +7,7 @@ This code deliberately doesn't use modules, to show all the resources that have 
 ## Scenarios
 
 * [Cloud SQL proxy on a VM, via IAP tunnel](./cloud-sql-proxy)
+* [Service Account Impersonation](./service_account_impersonation) 
 * [HA VPN](./ha_vpn_tunnel)
 
 
