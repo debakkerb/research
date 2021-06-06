@@ -38,7 +38,8 @@ resource "google_compute_subnetwork" "sql_subnetwork" {
 }
 
 resource "google_compute_shared_vpc_host_project" "host_project" {
-  project = module.cloud_sql_proxy_host_project.project_id
+  provider = google-beta
+  project  = module.cloud_sql_proxy_host_project.project_id
 
   depends_on = [
     google_compute_network.host_network,
@@ -47,6 +48,7 @@ resource "google_compute_shared_vpc_host_project" "host_project" {
 }
 
 resource "google_compute_shared_vpc_service_project" "service_project" {
+  provider        = google-beta
   host_project    = module.cloud_sql_proxy_host_project.project_id
   service_project = module.cloud_sql_proxy_service_project.project_id
 
@@ -103,7 +105,7 @@ resource "google_compute_firewall" "ssh_ingress_firewall" {
 
 // External access
 resource "google_compute_router" "router" {
-  count = var.allow_internet_egress_traffic ? 1 : 0
+  count = var.enable_internet_egress_traffic ? 1 : 0
 
   project = module.cloud_sql_proxy_host_project.project_id
   name    = "proxy-ext-access-router"
@@ -116,7 +118,7 @@ resource "google_compute_router" "router" {
 }
 
 resource "google_compute_router_nat" "nat" {
-  count = var.allow_internet_egress_traffic ? 1 : 0
+  count = var.enable_internet_egress_traffic ? 1 : 0
 
   project                            = module.cloud_sql_proxy_host_project.project_id
   name                               = "proxy-ext-access-nat"
@@ -132,12 +134,12 @@ resource "google_compute_router_nat" "nat" {
 }
 
 resource "google_compute_route" "external_access" {
-  count = var.allow_internet_egress_traffic ? 1 : 0
+  count = var.enable_internet_egress_traffic ? 1 : 0
 
   project          = module.cloud_sql_proxy_host_project.project_id
   dest_range       = "0.0.0.0/0"
   name             = "proxy-external-access"
   network          = google_compute_network.host_network.name
-  next_hop_gateway = "global/gateways/default-internet-gateway"
+  next_hop_gateway = "default-internet-gateway"
 }
 
