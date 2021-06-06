@@ -16,7 +16,7 @@
 
 module "cloud_sql_proxy_host_project" {
   source  = "terraform-google-modules/project-factory/google"
-  version = "~> 10.3"
+  version = "~> 10.0"
 
   name              = "${var.prefix}-sql-proxy-host"
   random_project_id = true
@@ -33,7 +33,7 @@ module "cloud_sql_proxy_host_project" {
 
 module "cloud_sql_proxy_service_project" {
   source  = "terraform-google-modules/project-factory/google"
-  version = "~> 10.3"
+  version = "~> 10.0"
 
   name              = "${var.prefix}-sql-proxy-svc"
   random_project_id = true
@@ -46,6 +46,7 @@ module "cloud_sql_proxy_service_project" {
     "sqladmin.googleapis.com",
     "servicenetworking.googleapis.com",
     "logging.googleapis.com",
-    "secretmanager.googleapis.com"
+    "secretmanager.googleapis.com",
+    "iap.googleapis.com"
   ]
 }
