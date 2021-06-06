@@ -81,7 +81,7 @@ resource "google_compute_firewall" "iap_ingress_firewall" {
 }
 
 resource "google_compute_firewall" "ssh_ingress_firewall" {
-  count     = var.block_ssh ? 0 : 1
+  count     = var.enable_ssh_access ? 1 : 0
   project   = module.cloud_sql_proxy_host_project.project_id
   name      = "allow-ssh-ingress"
   network   = google_compute_network.host_network.self_link
@@ -103,7 +103,7 @@ resource "google_compute_firewall" "ssh_ingress_firewall" {
 
 // External access
 resource "google_compute_router" "router" {
-  count = var.block_egress ? 0 : 1
+  count = var.allow_internet_egress_traffic ? 1 : 0
 
   project = module.cloud_sql_proxy_host_project.project_id
   name    = "proxy-ext-access-router"
@@ -116,7 +116,7 @@ resource "google_compute_router" "router" {
 }
 
 resource "google_compute_router_nat" "nat" {
-  count = var.block_egress ? 0 : 1
+  count = var.allow_internet_egress_traffic ? 1 : 0
 
   project                            = module.cloud_sql_proxy_host_project.project_id
   name                               = "proxy-ext-access-nat"
@@ -132,7 +132,7 @@ resource "google_compute_router_nat" "nat" {
 }
 
 resource "google_compute_route" "external_access" {
-  count = var.block_egress ? 0 : 1
+  count = var.allow_internet_egress_traffic ? 1 : 0
 
   project          = module.cloud_sql_proxy_host_project.project_id
   dest_range       = "0.0.0.0/0"

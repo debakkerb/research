@@ -28,15 +28,15 @@ variable "zone" {
   default = "europe-west1-b"
 }
 
-variable "block_egress" {
+variable "allow_internet_egress_traffic" {
   description = "The compute instance requires external access to download patches and scripts. Once the VM is installed, set this to false, so the Cloud NAT and Router are deleted."
   default     = false
   type        = bool
 }
 
-variable "block_ssh" {
+variable "enable_ssh_access" {
   description = "Block SSH access to the VM.  Enabled by default."
-  default     = true
+  default     = false
   type        = bool
 }
 
@@ -48,4 +48,10 @@ variable "subnet_cidr_range" {
 variable "cloud_sql_proxy_version" {
   type    = string
   default = "v1.21.0"
+}
+
+variable "create_custom_compute_get_role" {
+  description = "Create a custom role that contains the bare minimum for retrieving Compute instance details.  The identity running this code requires the Project IAM Role permissions on the project, or the equivalent at organization level."
+  type        = bool
+  default     = true
 }

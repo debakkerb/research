@@ -8,6 +8,14 @@ In order to connect to a Cloud SQL instance with a private IP address, you can u
 
 To make this example more realistic, we run the Cloud SQL instance in a Shared VPC, as this is normally the setup most Enterprise customers have configured. This way, we can clearly share what resources are running in which project (host and service).  
 
+## IAM Permissions
+
+To grant access to the proper IAM permissions, the module offers the ability to create a custom role.  Identities have to be able to a) retrieve the instance details (`compute.instances.get`) and to update the metadata, in case they want to upload their SSH keys (`compute.instances.setMetadata`) if they want to access the VM over SSH.  
+
+As we want to apply the principle of least privilege, we apply those IAM permissions at instance level and not at project level.  Otherwise, identities gain access to *all* the VMs in the project. 
+
+If the identity running the Terraform code doesn't have the necessary permissions, the custom role is not created and the role Instance Admin is granted on the instance itself.
+
 ## How To Run
 
 To be able to run this example, you need the necessary permissions to create projects and a shared vpc.
