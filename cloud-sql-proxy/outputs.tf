@@ -15,7 +15,7 @@
  */
 
 output "start_ssh_tunnel" {
-  value = "gcloud compute ssh ${google_compute_instance.proxy_instance.name} --project ${module.cloud_sql_proxy_service_project.project_id}"
+  value = "gcloud compute ssh ${google_compute_instance.proxy_instance.name} --project ${module.cloud_sql_proxy_service_project.project_id} --zone ${google_compute_instance.proxy_instance.zone}"
 }
 
 output "sql_instance_connection_name" {
