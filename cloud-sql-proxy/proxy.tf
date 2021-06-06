@@ -30,6 +30,7 @@ resource "google_compute_instance" "proxy_instance" {
 
   metadata = {
     startup-script = local_file.sql_proxy_install_script.content
+    enable-oslogin = var.enable_ssh_access ? "TRUE" : "FALSE"
   }
 
   shielded_instance_config {
@@ -59,12 +60,6 @@ resource "google_compute_instance" "proxy_instance" {
     google_compute_shared_vpc_service_project.service_project,
     null_resource.chmod_execute_sql_install_script
   ]
-}
-
-resource "google_compute_project_metadata_item" "oslogin" {
-  project = module.cloud_sql_proxy_service_project.project_id
-  key     = "oslogin-enabled"
-  value   = "TRUE"
 }
 
 data "template_file" "sql_proxy_install_script_tmpl" {
