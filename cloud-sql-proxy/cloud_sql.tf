@@ -110,7 +110,7 @@ resource "google_secret_manager_secret_version" "sql_db_user_password" {
 
 resource "google_secret_manager_secret_iam_member" "identity_password_access" {
   project   = module.cloud_sql_proxy_service_project.project_id
-  member    = "user:${var.identity}"
+  member    = var.identity
   role      = "roles/secretmanager.secretAccessor"
   secret_id = google_secret_manager_secret.sql_db_user_password.id
 }
