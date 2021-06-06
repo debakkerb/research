@@ -18,24 +18,32 @@ variable "organization_id" {}
 variable "billing_account_id" {}
 variable "parent_folder_id" {}
 variable "prefix" {}
-variable "identity" {}
+variable "proxy_access_identities" {
+  description = "List of identities who require access to the SQL proxy, and database.  Every identity should be prefixed with the type, for example user:, serviceAccount: and/or group:"
+  type        = set(string)
+  default     = []
+}
 
 variable "region" {
-  default = "europe-west1"
+  description = "Default region to use for all resources.  Will be used to configure the provider."
+  type        = string
+  default     = "europe-west1"
 }
 
 variable "zone" {
-  default = "europe-west1-b"
+  description = "Default zone to use for all resources.  Will be used to configure the provider."
+  type        = string
+  default     = "europe-west1-b"
 }
 
 variable "enable_internet_egress_traffic" {
   description = "The compute instance requires external access to download patches and scripts. Once the VM is installed, set this to false, so the Cloud NAT and Router are deleted."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "enable_ssh_access" {
-  description = "Block SSH access to the VM.  Enabled by default."
+  description = "Allow SSH access to the VM.  This will enable SSH access for all identities, so be careful when enabling this."
   type        = bool
   default     = false
 }
@@ -49,7 +57,7 @@ variable "subnet_cidr_range" {
 variable "cloud_sql_proxy_version" {
   description = "Which version to use of the Cloud SQL proxy."
   type        = string
-  default     = "v1.21.0"
+  default     = "v1.23.0"
 }
 
 variable "create_custom_compute_get_role" {
