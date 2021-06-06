@@ -71,8 +71,9 @@ data "template_file" "sql_proxy_install_script_tmpl" {
 }
 
 resource "local_file" "sql_proxy_install_script" {
-  content  = data.template_file.sql_proxy_install_script_tmpl.rendered
-  filename = "${path.module}/scripts/cloud_sql_proxy_install.sh"
+  content         = data.template_file.sql_proxy_install_script_tmpl.rendered
+  filename        = "${path.module}/scripts/cloud_sql_proxy_install.sh"
+  file_permission = "0777"
 }
 
 resource "null_resource" "chmod_execute_sql_install_script" {
