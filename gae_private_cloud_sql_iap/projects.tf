@@ -25,7 +25,7 @@ module "host_project" {
   billing_account   = var.billing_account_id
 
   activate_apis = [
-    "cloudsql.googleapis.com",
+    "sqladmin.googleapis.com",
     "storage.googleapis.com",
     "servicenetworking.googleapis.com"
   ]

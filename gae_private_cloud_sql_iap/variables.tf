@@ -17,7 +17,12 @@
 variable "organization_id" {}
 variable "billing_account_id" {}
 variable "parent_folder_id" {}
-variable "prefix" {}
+
+variable "prefix" {
+  description = "Prefix to be added to all resource names."
+  type        = string
+  default     = "rsrch"
+}
 
 variable "region" {
   description = "Default region to use for all resources.  Will be used to configure the provider."
@@ -35,4 +40,10 @@ variable "subnet_cidr_block" {
   description = "CIDR block allocated for the subnet hosting the resources."
   type        = string
   default     = "10.0.0.0/16"
+}
+
+variable "serverless_connector_subnet_cidr_block" {
+  description = "CIDR block to be used for the serverless connector."
+  type        = string
+  default     = "10.255.0.0/28"
 }
