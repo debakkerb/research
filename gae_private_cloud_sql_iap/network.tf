@@ -153,3 +153,16 @@ resource "google_compute_firewall" "vpc_connector_network_ingress" {
     protocol = "udp"
   }
 }
+
+resource "google_vpc_access_connector" "serverless_access_connector" {
+  provider     = google-beta
+  project      = module.service_project.project_id
+  name         = "${var.prefix}-serverless-access-${random_id.name_randomizer.hex}"
+  region       = var.region
+  machine_type = var.serverless_access_machine_type
+
+  subnet {
+    name       = google_compute_subnetwork.serverless_connector_subnet.name
+    project_id = module.host_project.project_id
+  }
+}

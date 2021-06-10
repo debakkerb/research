@@ -30,6 +30,18 @@ variable "region" {
   default     = "europe-west1"
 }
 
+variable "app_engine_region" {
+  description = "Region where the GAE application should be created."
+  type        = string
+  default     = "europe-west"
+}
+
+variable "regenerate_sql_server" {
+  description = "Increase this value to regenerate the sql server.  This will generate a new name for the SQL instance."
+  type        = number
+  default     = 1
+}
+
 variable "zone" {
   description = "Default zone to use for all resources.  Will be used to configure the provider."
   type        = string
@@ -46,4 +58,10 @@ variable "serverless_connector_subnet_cidr_block" {
   description = "CIDR block to be used for the serverless connector."
   type        = string
   default     = "10.255.0.0/28"
+}
+
+variable "serverless_access_machine_type" {
+  description = "Machine type to be used for the serverless connector."
+  type        = string
+  default     = "e2-micro"
 }

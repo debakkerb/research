@@ -17,7 +17,7 @@
 resource "google_compute_global_address" "sql_instance_private_ip" {
   provider = google-beta
 
-  project       = module.service_project.project_id
+  project       = module.host_project.project_id
   name          = "sql-private-address"
   purpose       = "VPC_PEERING"
   address_type  = "INTERNAL"
@@ -36,12 +36,19 @@ resource "google_service_networking_connection" "private_vpc_connection" {
   ]
 }
 
+resource "random_id" "name_randomizer" {
+  byte_length = 4
+  keepers = {
+    regenerate_sql_server = var.regenerate_sql_server
+  }
+}
+
 resource "google_sql_database_instance" "private_sql_instance" {
   provider = google-beta
 
   project             = module.service_project.project_id
   deletion_protection = false
-  name                = "${var.prefix}-sql-instance"
+  name                = "${var.prefix}-sql-instance-${random_id.name_randomizer.hex}"
   region              = var.region
   database_version    = "POSTGRES_11"
 

@@ -46,6 +46,7 @@ module "service_project" {
     "storage.googleapis.com",
     "servicenetworking.googleapis.com",
     "logging.googleapis.com",
-    "secretmanager.googleapis.com"
+    "secretmanager.googleapis.com",
+    "vpcaccess.googleapis.com"
   ]
 }

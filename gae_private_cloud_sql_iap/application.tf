@@ -16,5 +16,5 @@
 
 resource "google_app_engine_application" "records_application" {
   project     = module.service_project.project_id
-  location_id = var.region
+  location_id = var.app_engine_region
 }
