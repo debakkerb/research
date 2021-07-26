@@ -5,10 +5,5 @@
 *.tfstate**
 **/terraform.tfvars
 **/healthcheck.zip
-**/backend.tf
-**/.terraform.lock.hcl
 
 **/credentials.txt
-
-# Generated SSH files
-cloud_sql_proxy_install.sh
