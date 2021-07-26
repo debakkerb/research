@@ -5,10 +5,13 @@ This repository contains a number of scripts which have been used to investigate
 This code deliberately doesn't use modules, to show all the resources that have been created to achieve this result.  It's not intended to be used in PRD use, but to use as a guide on what resources are being used and how they are configured.
 
 ## Scenarios
-* [Impersonating Service Accounts for Build Pipelines](./service_account_impersonation)
-* [Cloud Function Private Healthcheck](./private_function_ping)
-* [HA VPN](./ha_vpn_tunnel/)
-* [Log Export Sinks](./org_sink_export/)
-* [DNS Hub and Spoke](./dns_hub_spoke)
-* [Audit Sinks](./audit_sink)
-* [VPC SC](./vpc_sc)
+* [Cloud SQL Proxy](./cloud-sql-proxy)
+* [Google App Engine with Private Cloud SQL](./gae_private_cloud_sql_iap)
+
+## Ideas
+* Private GKE Cluster in a Shared VPC
+* Windows RDP
+* Log sink export for organizations
+* Organization setup
+* Service Account impersonation
+* Apigee X deployment
