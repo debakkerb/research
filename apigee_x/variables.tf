@@ -19,6 +19,11 @@ variable "billing_account_id" {}
 variable "parent_folder_id" {}
 variable "prefix" {}
 
+variable "domain" {
+  description = "Domain that will be used to access the APIs.  This will be used to create a managed SSL certificate."
+  type        = string
+}
+
 variable "region" {
   description = "Region where the resources will be created."
   type        = string

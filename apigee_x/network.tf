@@ -18,7 +18,6 @@ resource "google_compute_network" "default" {
   project                         = module.default.project_id
   name                            = "${var.prefix}-nw"
   auto_create_subnetworks         = false
-  delete_default_routes_on_create = true
   description                     = "Network to be peered with Apigee X resources."
 }
 
@@ -29,7 +28,12 @@ resource "google_compute_subnetwork" "default" {
   network                  = google_compute_network.default.self_link
   region                   = var.region
   private_ip_google_access = true
-  enable_flow_logs         = true
+
+  log_config {
+    aggregation_interval = "INTERVAL_10_MIN"
+    flow_sampling        = 0.5
+    metadata             = "INCLUDE_ALL_METADATA"
+  }
 }
 
 resource "google_compute_global_address" "default" {

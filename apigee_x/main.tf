@@ -32,6 +32,7 @@ module "default" {
     "vpcaccess.googleapis.com",
     "cloudbuild.googleapis.com",
     "logging.googleapis.com",
-    "kms.googleapis.com"
+    "cloudkms.googleapis.com"
   ]
 }
+
