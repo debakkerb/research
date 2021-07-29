@@ -7,6 +7,7 @@ This code deliberately doesn't use modules, to show all the resources that have 
 ## Scenarios
 * [Cloud SQL Proxy](./cloud-sql-proxy)
 * [Google App Engine with Private Cloud SQL](./gae_private_cloud_sql_iap)
+* [HTTPS Load Balancer with Managed Instance Group](./https_lb_mig)
 
 ## Ideas
 * Private GKE Cluster in a Shared VPC

@@ -233,7 +233,6 @@ resource "google_compute_backend_service" "apigee_backend_service" {
   }
 }
 
-
 resource "google_compute_url_map" "apigee_be_url_map" {
   project         = module.default.project_id
   name            = "${var.prefix}-apigee-url-map"
@@ -255,85 +254,3 @@ resource "google_compute_global_forwarding_rule" "apigee_forwarding_rule" {
   port_range            = "443"
   load_balancing_scheme = "EXTERNAL"
 }
-
-/*
-resource "google_compute_global_forwarding_rule" "apigee_mig_https_lb_rule" {
-  ip_address  = "34.120.45.154"
-  ip_protocol = "TCP"
-  labels = {
-    managed-by-cnrm = "true"
-  }
-  load_balancing_scheme = "EXTERNAL"
-  name                  = "apigee-mig-https-lb-rule"
-  port_range            = "443-443"
-  project               = "bdb-main-apigee-8d42"
-  target                = "https://www.googleapis.com/compute/beta/projects/bdb-main-apigee-8d42/global/targetHttpsProxies/apigee-mig-https-proxy"
-}
-# terraform import google_compute_global_forwarding_rule.apigee_mig_https_lb_rule projects/bdb-main-apigee-8d42/global/forwardingRules/apigee-mig-https-lb-rule
-resource "google_compute_health_check" "hc_apigee_mig_443" {
-  check_interval_sec = 5
-  healthy_threshold  = 2
-  https_health_check {
-    port               = 443
-    port_specification = "USE_FIXED_PORT"
-    proxy_header       = "NONE"
-    request_path       = "/healthz/ingress"
-  }
-  name                = "hc-apigee-mig-443"
-  project             = "bdb-main-apigee-8d42"
-  timeout_sec         = 5
-  unhealthy_threshold = 2
-}
-
-resource "google_compute_global_address" "lb_ipv4_vip_1" {
-  address      = "34.120.45.154"
-  address_type = "EXTERNAL"
-  ip_version   = "IPV4"
-  labels = {
-    managed-by-cnrm = "true"
-  }
-  name    = "lb-ipv4-vip-1"
-  project = "bdb-main-apigee-8d42"
-}
-
-resource "google_compute_route" "default_route_39880443b4daa06c" {
-  description = "Default local route to the subnetwork 10.100.0.0/28."
-  dest_range  = "10.100.0.0/28"
-  name        = "default-route-39880443b4daa06c"
-  network     = "https://www.googleapis.com/compute/v1/projects/bdb-main-apigee-8d42/global/networks/cf-network"
-  project     = "bdb-main-apigee-8d42"
-}
-# terraform import google_compute_route.default_route_39880443b4daa06c projects/bdb-main-apigee-8d42/global/routes/default-route-39880443b4daa06c
-resource "google_compute_network" "cf_network" {
-  name         = "cf-network"
-  project      = "bdb-main-apigee-8d42"
-  routing_mode = "REGIONAL"
-}
-# terraform import google_compute_network.cf_network projects/bdb-main-apigee-8d42/global/networks/cf-network
-resource "google_compute_router" "rtr_egress_traffic" {
-  bgp {
-    advertise_mode = "DEFAULT"
-    asn            = 64514
-  }
-  name    = "rtr-egress-traffic"
-  network = "https://www.googleapis.com/compute/v1/projects/bdb-main-apigee-8d42/global/networks/cf-network"
-  project = "bdb-main-apigee-8d42"
-  region  = "europe-west2"
-}
-
-resource "google_compute_route" "peering_route_668f949ec29fd606" {
-  description = "Auto generated route via peering [servicenetworking-googleapis-com]."
-  dest_range  = "10.136.8.0/28"
-  name        = "peering-route-668f949ec29fd606"
-  network     = "https://www.googleapis.com/compute/v1/projects/bdb-main-apigee-8d42/global/networks/cf-network"
-  project     = "bdb-main-apigee-8d42"
-}
-
-resource "google_compute_url_map" "apigee_mig_proxy_map" {
-  default_service = "https://www.googleapis.com/compute/v1/projects/bdb-main-apigee-8d42/global/backendServices/apigee-mig-backend"
-  name            = "apigee-mig-proxy-map"
-  project         = "bdb-main-apigee-8d42"
-}
-
-
-*/
