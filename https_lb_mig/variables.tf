@@ -39,3 +39,15 @@ variable "domain" {
   description = "Domain that will be used to generate the SSL certificate"
   type        = string
 }
+
+variable "enable_egress_traffic" {
+  description = "Enable traffic to the public internet from the VMs."
+  type        = bool
+  default     = true
+}
+
+variable "enable_iap_access" {
+  description = "Enable SSH access to the underlying VMs."
+  type        = bool
+  default     = false
+}
