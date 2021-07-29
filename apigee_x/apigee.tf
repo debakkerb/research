@@ -149,7 +149,6 @@ resource "google_compute_health_check" "apigee_instance_hc" {
   project     = module.default.project_id
   name        = "apigee-mig-hc"
   description = "Health check for the Apigee instances, used by the load balancer."
-
   healthy_threshold   = 2
   unhealthy_threshold = 5
 
@@ -166,20 +165,22 @@ resource "google_compute_region_autoscaler" "default" {
   region  = var.region
 
   autoscaling_policy {
-    max_replicas = 20
-    min_replicas = 2
+    max_replicas    = 20
+    min_replicas    = 2
+    cooldown_period = 90
+
     cpu_utilization {
       target = 0.75
     }
-    cooldown_period = 90
   }
 }
 
 resource "google_compute_global_address" "https_lb_ip_address" {
-  project     = module.default.project_id
-  name        = "${var.prefix}-lb-ip-address"
-  ip_version  = "IPV4"
-  description = "IP address for the public Load Balancer."
+  project      = module.default.project_id
+  name         = "${var.prefix}-lb-ip-address"
+  ip_version   = "IPV4"
+  description  = "IP address for the public Load Balancer."
+  address_type = "EXTERNAL"
 }
 
 resource "google_compute_firewall" "lb_to_mig_access" {
@@ -187,6 +188,7 @@ resource "google_compute_firewall" "lb_to_mig_access" {
   name        = "lb-mig-access"
   network     = google_compute_network.default.self_link
   description = "Provides access to the Managed Instance Group from the Load Balancer."
+  direction   = "INGRESS"
 
   allow {
     protocol = "tcp"
@@ -195,7 +197,8 @@ resource "google_compute_firewall" "lb_to_mig_access" {
 
   source_ranges = [
     "130.244.0.0/22",
-    "35.191.0.0/16"
+    "35.191.0.0/16",
+    "130.211.0.0/22"
   ]
 
   target_tags = [
@@ -204,8 +207,9 @@ resource "google_compute_firewall" "lb_to_mig_access" {
 }
 
 resource "google_compute_managed_ssl_certificate" "https_lb_managed_certificate" {
-  project = module.default.project_id
-  name    = "apigee-lb-managed-cert"
+  project     = module.default.project_id
+  name        = "apigee-lb-managed-cert"
+  description = "SSL Certificate to be attached to the load balancer."
 
   managed {
     domains = [var.domain]
@@ -213,38 +217,123 @@ resource "google_compute_managed_ssl_certificate" "https_lb_managed_certificate"
 
 }
 
-resource "google_compute_region_backend_service" "apigee_backend_services" {
+resource "google_compute_backend_service" "apigee_backend_service" {
   project                         = module.default.project_id
-  name                            = "${var.prefix}-apigee-be-hc"
-  health_checks                   = [google_compute_health_check.apigee_instance_hc.id]
+  health_checks                   = [google_compute_health_check.apigee_instance_hc.self_link]
+  name                            = "${var.prefix}-apigee-be"
+  load_balancing_scheme           = "EXTERNAL"
+  port_name                       = "https"
+  protocol                        = "HTTPS"
+  session_affinity                = "NONE"
   timeout_sec                     = 60
   connection_draining_timeout_sec = 300
-  region                          = var.region
-  network                         = google_compute_network.default.self_link
 
   backend {
     group = google_compute_region_instance_group_manager.default.instance_group
   }
 }
 
-resource "google_compute_region_url_map" "apigee_be_url_map" {
+
+resource "google_compute_url_map" "apigee_be_url_map" {
   project         = module.default.project_id
   name            = "${var.prefix}-apigee-url-map"
-  default_service = google_compute_region_backend_service.apigee_backend_services.id
-  region          = var.region
+  default_service = google_compute_backend_service.apigee_backend_service.self_link
 }
 
-resource "google_compute_region_target_https_proxy" "apigee_target_proxy" {
+resource "google_compute_target_https_proxy" "apigee_target_proxy" {
   project          = module.default.project_id
   name             = "${var.prefix}-apigee-mig-https-proxy"
-  ssl_certificates = [google_compute_managed_ssl_certificate.https_lb_managed_certificate.name]
-  url_map          = google_compute_region_url_map.apigee_be_url_map.name
+  ssl_certificates = [google_compute_managed_ssl_certificate.https_lb_managed_certificate.self_link]
+  url_map          = google_compute_url_map.apigee_be_url_map.self_link
 }
 
 resource "google_compute_global_forwarding_rule" "apigee_forwarding_rule" {
-  project    = module.default.project_id
-  name       = "${var.prefix}-apigee-be-fwd-rule"
-  ip_address = google_compute_global_address.https_lb_ip_address.name
-  target     = google_compute_region_target_https_proxy.apigee_target_proxy.name
-  port_range = "443"
+  project               = module.default.project_id
+  name                  = "${var.prefix}-apigee-be-fwd-rule"
+  ip_address            = google_compute_global_address.https_lb_ip_address.address
+  target                = google_compute_target_https_proxy.apigee_target_proxy.self_link
+  port_range            = "443"
+  load_balancing_scheme = "EXTERNAL"
 }
+
+/*
+resource "google_compute_global_forwarding_rule" "apigee_mig_https_lb_rule" {
+  ip_address  = "34.120.45.154"
+  ip_protocol = "TCP"
+  labels = {
+    managed-by-cnrm = "true"
+  }
+  load_balancing_scheme = "EXTERNAL"
+  name                  = "apigee-mig-https-lb-rule"
+  port_range            = "443-443"
+  project               = "bdb-main-apigee-8d42"
+  target                = "https://www.googleapis.com/compute/beta/projects/bdb-main-apigee-8d42/global/targetHttpsProxies/apigee-mig-https-proxy"
+}
+# terraform import google_compute_global_forwarding_rule.apigee_mig_https_lb_rule projects/bdb-main-apigee-8d42/global/forwardingRules/apigee-mig-https-lb-rule
+resource "google_compute_health_check" "hc_apigee_mig_443" {
+  check_interval_sec = 5
+  healthy_threshold  = 2
+  https_health_check {
+    port               = 443
+    port_specification = "USE_FIXED_PORT"
+    proxy_header       = "NONE"
+    request_path       = "/healthz/ingress"
+  }
+  name                = "hc-apigee-mig-443"
+  project             = "bdb-main-apigee-8d42"
+  timeout_sec         = 5
+  unhealthy_threshold = 2
+}
+
+resource "google_compute_global_address" "lb_ipv4_vip_1" {
+  address      = "34.120.45.154"
+  address_type = "EXTERNAL"
+  ip_version   = "IPV4"
+  labels = {
+    managed-by-cnrm = "true"
+  }
+  name    = "lb-ipv4-vip-1"
+  project = "bdb-main-apigee-8d42"
+}
+
+resource "google_compute_route" "default_route_39880443b4daa06c" {
+  description = "Default local route to the subnetwork 10.100.0.0/28."
+  dest_range  = "10.100.0.0/28"
+  name        = "default-route-39880443b4daa06c"
+  network     = "https://www.googleapis.com/compute/v1/projects/bdb-main-apigee-8d42/global/networks/cf-network"
+  project     = "bdb-main-apigee-8d42"
+}
+# terraform import google_compute_route.default_route_39880443b4daa06c projects/bdb-main-apigee-8d42/global/routes/default-route-39880443b4daa06c
+resource "google_compute_network" "cf_network" {
+  name         = "cf-network"
+  project      = "bdb-main-apigee-8d42"
+  routing_mode = "REGIONAL"
+}
+# terraform import google_compute_network.cf_network projects/bdb-main-apigee-8d42/global/networks/cf-network
+resource "google_compute_router" "rtr_egress_traffic" {
+  bgp {
+    advertise_mode = "DEFAULT"
+    asn            = 64514
+  }
+  name    = "rtr-egress-traffic"
+  network = "https://www.googleapis.com/compute/v1/projects/bdb-main-apigee-8d42/global/networks/cf-network"
+  project = "bdb-main-apigee-8d42"
+  region  = "europe-west2"
+}
+
+resource "google_compute_route" "peering_route_668f949ec29fd606" {
+  description = "Auto generated route via peering [servicenetworking-googleapis-com]."
+  dest_range  = "10.136.8.0/28"
+  name        = "peering-route-668f949ec29fd606"
+  network     = "https://www.googleapis.com/compute/v1/projects/bdb-main-apigee-8d42/global/networks/cf-network"
+  project     = "bdb-main-apigee-8d42"
+}
+
+resource "google_compute_url_map" "apigee_mig_proxy_map" {
+  default_service = "https://www.googleapis.com/compute/v1/projects/bdb-main-apigee-8d42/global/backendServices/apigee-mig-backend"
+  name            = "apigee-mig-proxy-map"
+  project         = "bdb-main-apigee-8d42"
+}
+
+
+*/
