@@ -26,16 +26,24 @@ data "google_compute_image" "debian" {
   family  = "debian-10"
 }
 
+data "google_compute_zones" "zones" {
+  project = module.project.project_id
+  region  = var.region
+}
+
 resource "google_compute_instance_template" "default" {
-  project      = module.project.project_id
-  name         = "${var.prefix}-instance"
-  description  = "Instance template for the Apache hosts."
-  region       = var.region
-  machine_type = "n2-standard-2"
+  project                 = module.project.project_id
+  name                    = "${var.prefix}-instance"
+  description             = "Instance template for the Apache hosts."
+  region                  = var.region
+  machine_type            = "n2-standard-2"
+  metadata_startup_script = file("${path.module}/scripts/startup.sh")
 
   disk {
     boot         = true
+    auto_delete  = true
     disk_size_gb = 20
+    source_image = data.google_compute_image.debian.self_link
   }
 
   network_interface {
@@ -46,6 +54,35 @@ resource "google_compute_instance_template" "default" {
     email  = google_service_account.instance_identity.email
     scopes = ["cloud-platform"]
   }
+
+  tags = ["web-app-backend"]
+}
+
+resource "google_compute_instance_template" "canary" {
+  project                 = module.project.project_id
+  name                    = "${var.prefix}-canary-instance"
+  description             = "Instance template for the Apache hosts."
+  region                  = var.region
+  machine_type            = "n2-standard-2"
+  metadata_startup_script = file("${path.module}/scripts/startup.sh")
+
+  disk {
+    boot         = true
+    auto_delete  = true
+    disk_size_gb = 20
+    source_image = data.google_compute_image.debian.self_link
+  }
+
+  network_interface {
+    subnetwork = google_compute_subnetwork.default.self_link
+  }
+
+  service_account {
+    email  = google_service_account.instance_identity.email
+    scopes = ["cloud-platform"]
+  }
+
+  tags = ["web-app-backend"]
 }
 
 resource "google_compute_region_instance_group_manager" "default" {
@@ -56,13 +93,31 @@ resource "google_compute_region_instance_group_manager" "default" {
   region             = var.region
   target_size        = 2
 
+  auto_healing_policies {
+    health_check = google_compute_health_check.backend_health_check.id
+    initial_delay_sec = 300
+  }
+
   named_port {
     name = "http"
     port = 80
   }
 
   version {
-    instance_template = google_compute_instance_template.default.self_link
+    name              = "backend-main"
+    instance_template = google_compute_instance_template.default.id
+  }
+
+  version {
+    name              = "backend-canary"
+    instance_template = google_compute_instance_template.canary.id
+    target_size {
+      fixed = 1
+    }
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
@@ -70,6 +125,7 @@ resource "google_compute_region_autoscaler" "default" {
   project = module.project.project_id
   name    = "${var.prefix}-apache-mig-scaler"
   target  = google_compute_region_instance_group_manager.default.id
+  region  = var.region
 
   autoscaling_policy {
     max_replicas    = 5

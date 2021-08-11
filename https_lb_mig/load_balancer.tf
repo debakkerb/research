@@ -16,7 +16,7 @@
 
 resource "google_compute_global_address" "https_lb_ip_address" {
   project      = module.project.project_id
-  name         = "${var.prefix}-lb-ip-address"
+  name         = "${var.prefix}-lb-ip"
   ip_version   = "IPV4"
   description  = "IP address for the public Load Balancer."
   address_type = "EXTERNAL"
@@ -40,17 +40,16 @@ resource "google_compute_firewall" "gcp_health_check" {
 
   allow {
     protocol = "tcp"
-    ports    = [443]
+    ports    = [80]
   }
 
   source_ranges = [
-    "130.244.0.0/22",
     "35.191.0.0/16",
     "130.211.0.0/22"
   ]
 
   target_tags = [
-    "gke-apigee-proxy"
+    "web-app-backend"
   ]
 }
 
@@ -65,19 +64,37 @@ resource "google_compute_managed_ssl_certificate" "https_lb_managed_certificate"
 
 }
 
+resource "google_compute_health_check" "backend_health_check" {
+  project             = module.project.project_id
+  name                = "app-backend-hc"
+  description         = "Healthcheck for the web application backend."
+  healthy_threshold   = 2
+  unhealthy_threshold = 5
+  check_interval_sec  = 10
+
+  http_health_check {
+    port_name    = "http"
+    request_path = "/"
+  }
+}
+
 resource "google_compute_backend_service" "backend_service" {
   project                         = module.project.project_id
-  health_checks                   = [google_compute_health_check.mig_healthcheck.self_link]
+  health_checks                   = [google_compute_health_check.backend_health_check.self_link]
   name                            = "${var.prefix}-backend"
   load_balancing_scheme           = "EXTERNAL"
-  port_name                       = "https"
-  protocol                        = "HTTPS"
+  port_name                       = "http"
+  protocol                        = "HTTP"
   session_affinity                = "NONE"
   timeout_sec                     = 60
   connection_draining_timeout_sec = 300
 
   backend {
     group = google_compute_region_instance_group_manager.default.instance_group
+  }
+
+  log_config {
+    enable = true
   }
 }
 
@@ -92,13 +109,4 @@ resource "google_compute_target_https_proxy" "target_proxy" {
   name             = "${var.prefix}-mig-https-proxy"
   ssl_certificates = [google_compute_managed_ssl_certificate.https_lb_managed_certificate.self_link]
   url_map          = google_compute_url_map.url_map.self_link
-}
-
-resource "google_compute_global_forwarding_rule" "forwarding_rule" {
-  project               = module.project.project_id
-  name                  = "${var.prefix}-be-fwd-rule"
-  ip_address            = google_compute_global_address.https_lb_ip_address.address
-  target                = google_compute_target_https_proxy.target_proxy.self_link
-  port_range            = "443"
-  load_balancing_scheme = "EXTERNAL"
 }

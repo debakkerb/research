@@ -26,22 +26,6 @@ module "project" {
 
   activate_apis = [
     "compute.googleapis.com",
+    "logging.googleapis.com"
   ]
 }
-
-resource "google_compute_network" "default" {
-  project                         = module.project.project_id
-  name                            = "${var.prefix}-lb-mig-nw"
-  description                     = "Network to host a managed instance group + external load balancer."
-  delete_default_routes_on_create = true
-  auto_create_subnetworks         = false
-}
-
-resource "google_compute_subnetwork" "default" {
-  project       = module.project.project_id
-  ip_cidr_range = var.cidr_range
-  name          = "${var.prefix}-lb-mig-snw"
-  network       = google_compute_network.default.self_link
-  region        = var.region
-}
-

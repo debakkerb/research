@@ -7,3 +7,5 @@
 **/healthcheck.zip
 
 **/credentials.txt
+
+*.lock.hcl
