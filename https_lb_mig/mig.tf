@@ -64,33 +64,6 @@ resource "google_compute_instance_template" "default" {
   tags = ["web-app-backend", "iap"]
 }
 
-resource "google_compute_instance_template" "canary" {
-  project                 = module.project.project_id
-  name_prefix             = "${var.prefix}-instance-"
-  description             = "Instance template for the Apache hosts."
-  region                  = var.region
-  machine_type            = "n2-standard-2"
-  metadata_startup_script = file("${path.module}/scripts/startup.sh")
-
-  disk {
-    boot         = true
-    auto_delete  = true
-    disk_size_gb = 20
-    source_image = data.google_compute_image.debian.self_link
-  }
-
-  network_interface {
-    subnetwork = google_compute_subnetwork.default.self_link
-  }
-
-  service_account {
-    email  = google_service_account.instance_identity.email
-    scopes = ["cloud-platform"]
-  }
-
-  tags = ["web-app-backend"]
-}
-
 resource "google_compute_region_instance_group_manager" "default" {
   project            = module.project.project_id
   name               = "${var.prefix}-mig-manager"
@@ -112,14 +85,6 @@ resource "google_compute_region_instance_group_manager" "default" {
   version {
     name              = "backend-main"
     instance_template = google_compute_instance_template.default.id
-  }
-
-  version {
-    name              = "backend-canary"
-    instance_template = google_compute_instance_template.canary.id
-    target_size {
-      fixed = 1
-    }
   }
 
   lifecycle {
