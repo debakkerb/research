@@ -13,7 +13,7 @@ Create a `terraform.tfvars`-file in the root of this directory with values for t
 - `domain`
 - `folder_id`
 
-Once done, run `terraform plan` and `terraform apply` to create the target infrastructure.  You need permissions on the `folder_id` to create projects (`roles/resourcemanager.projectCreator`).
+Once done, run `terraform plan` and `terraform apply` to create the target infrastructure.  You need permissions on the `folder_id` to create projects (`roles/resourcemanager.projectCreator`).  It takes quite a bit of time for the service to become available, as it takes a while to provision the SSL certificate.  In the output of the Terraform state, you will get the public IP address of the load balancer.  You need to use that public IP address to configure the A record that corresponds to the domain you set in your `terraform.tfvars` file.
 
 ## Resources
 
