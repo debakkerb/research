@@ -76,6 +76,10 @@ resource "google_compute_health_check" "backend_health_check" {
     port_name    = "http"
     request_path = "/"
   }
+
+  log_config {
+    enable = true
+  }
 }
 
 resource "google_compute_backend_service" "backend_service" {
