@@ -17,3 +17,7 @@
 output "load_balancer_ip_address" {
   value = google_compute_global_address.https_lb_ip_address.address
 }
+
+output "describe_instance_group" {
+  value = "gcloud compute instance-groups managed describe ${google_compute_region_instance_group_manager.default.name} --region ${var.region} --project ${module.project.project_id}"
+}
