@@ -7,7 +7,6 @@ We are not going to use any Terraform modules, as it's difficult to understand w
 There is already a [great article](https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-shared-vpc) out there that describes all the individual steps in more detail.  However, it uses `gcloud`-commands and it doesn't elaborate on some steps as much as I would like to.
 
 ## Components
-![Architecture](./architecture)
 
 The following components will be created as part of this article:
 - Host project
