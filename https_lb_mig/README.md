@@ -4,6 +4,17 @@ This folder will explore how to create an HTTPS load balancer, fronting a worklo
 
 As mentioned in the overall README-page, I'm deliberately not using any Terraform modules, so that you clearly understand what resources are being used and how these are configured.  
 
+## How To Run
+
+Create a `terraform.tfvars`-file in the root of this directory with values for the following variables:
+- `organization_id`
+- `billing_account_id`
+- `prefix`
+- `domain`
+- `folder_id`
+
+Once done, run `terraform plan` and `terraform apply` to create the target infrastructure.  You need permissions on the `folder_id` to create projects (`roles/resourcemanager.projectCreator`).
+
 ## Resources
 
 Global load balancers on GCP use an Anycast IP to target underlying services.  The path a request follows can be summarized as:
@@ -92,5 +103,6 @@ resource "google_compute_backend_service" "backend_service" {
   }
 }
 ```
+
 
 
