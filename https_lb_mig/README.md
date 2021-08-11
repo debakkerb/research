@@ -27,4 +27,70 @@ resource "google_compute_global_address" "https_lb_ip_address" {
 
 ### Forwarding Rule
 
-This is the IP address + port(s) on wich the LB will accept traffic.  In terms of protocol, both TCP and UDP are supported.  Be careful if 
+This is the IP address + port(s) on wich the LB will accept traffic.  In terms of protocol, both TCP and UDP are supported.  Be careful when configuring `load_balancing_scheme`, as it defines where traffic will be forwarded **from**.  This means that setting it to `INTERNAL` means that you only accept traffic from traffic that originated within the same VPC or a connected VPC.
+
+```terraform
+resource "google_compute_global_forwarding_rule" "https_lb_fwd_rule" {
+  project               = module.project.project_id
+  name                  = "${var.prefix}-lb-fwd-rule"
+  ip_address            = google_compute_global_address.https_lb_ip_address.address
+  target                = google_compute_target_https_proxy.target_proxy.self_link
+  port_range            = "443"
+  load_balancing_scheme = "EXTERNAL"
+}
+```
+
+### Target Proxy
+
+The target proxy is referenced by the forwarding rules and it defines where requests can be sent to.  It's main purpose is to redirect incoming requests to a URL map that is defined in the environment.
+
+```terraform
+resource "google_compute_target_https_proxy" "target_proxy" {
+  project          = module.project.project_id
+  name             = "${var.prefix}-mig-https-proxy"
+  ssl_certificates = [google_compute_managed_ssl_certificate.https_lb_managed_certificate.self_link]
+  url_map          = google_compute_url_map.url_map.self_link
+}
+```
+
+In this example, I'm using a Google managed SSL certificate, but it's perfectly fine to bring your own if you have one.
+
+### URL Map
+
+The purpose of the URL map is to define a list of backends that can receive requests.  Given that we are creating an L7 load balancer, this can be done based on paths.  E.g. /video should be sent to a particular backend server.  For this example, I've created a simple backend and have not made distinctions between requests.  
+
+```terraform
+resource "google_compute_url_map" "url_map" {
+  project         = module.project.project_id
+  name            = "${var.prefix}-url-map"
+  default_service = google_compute_backend_service.backend_service.self_link
+}
+```
+
+### Backend Service
+
+The backend service(s) are the resources that host the actual workloads.
+
+```terraform
+resource "google_compute_backend_service" "backend_service" {
+  project                         = module.project.project_id
+  health_checks                   = [google_compute_health_check.backend_health_check.self_link]
+  name                            = "${var.prefix}-backend"
+  load_balancing_scheme           = "EXTERNAL"
+  port_name                       = "http"
+  protocol                        = "HTTP"
+  session_affinity                = "NONE"
+  timeout_sec                     = 60
+  connection_draining_timeout_sec = 300
+
+  backend {
+    group = google_compute_region_instance_group_manager.default.instance_group
+  }
+
+  log_config {
+    enable = true
+  }
+}
+```
+
+
