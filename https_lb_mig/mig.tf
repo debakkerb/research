@@ -21,6 +21,12 @@ resource "google_service_account" "instance_identity" {
   description  = "Service account attached to instances in the managed instance group."
 }
 
+resource "google_project_iam_member" "log_access" {
+  project = module.project.project_id
+  member  = "serviceAccount:${google_service_account.instance_identity.email}"
+  role    = "roles/logging.logWriter"
+}
+
 data "google_compute_image" "debian" {
   project = "debian-cloud"
   family  = "debian-10"
@@ -94,7 +100,7 @@ resource "google_compute_region_instance_group_manager" "default" {
   target_size        = 2
 
   auto_healing_policies {
-    health_check = google_compute_health_check.backend_health_check.id
+    health_check      = google_compute_health_check.backend_health_check.id
     initial_delay_sec = 300
   }
 

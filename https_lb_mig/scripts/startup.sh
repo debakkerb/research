@@ -16,6 +16,7 @@
 
 export PRIVATE_IP=$(curl -s -X GET -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ip")
 export HOST_NAME=$(curl -s -X GET -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetadata/v1/instance/hostname")
+export ZONE=$(curl -s -X GET -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetadata/v1/instance/zone")
 
 apt-get update -y
 apt-get upgrade -y
@@ -36,6 +37,10 @@ cat >/var/www/html/index.html <<EOL
       <tr>
         <td>IP Address</td>
         <td>${PRIVATE_IP}</td>
+      </tr>
+      <tr>
+        <td>Zone</td>
+        <td>${ZONE}</td>
       </tr>
     </table>
   </body>

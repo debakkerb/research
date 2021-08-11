@@ -73,8 +73,11 @@ resource "google_compute_health_check" "backend_health_check" {
   check_interval_sec  = 10
 
   http_health_check {
-    port_name    = "http"
-    request_path = "/"
+    port_name          = "http"
+    request_path       = "/"
+    port_specification = "USE_NAMED_PORT"
+    proxy_header       = "NONE"
+
   }
 
   log_config {
