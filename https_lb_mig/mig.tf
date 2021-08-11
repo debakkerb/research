@@ -70,7 +70,7 @@ resource "google_compute_region_instance_group_manager" "default" {
   base_instance_name = "${var.prefix}-web"
   description        = "Instance Group manager for Apache weblayer."
   region             = var.region
-  target_size        = 2
+  target_size        = 3
 
   auto_healing_policies {
     health_check      = google_compute_health_check.backend_health_check.id

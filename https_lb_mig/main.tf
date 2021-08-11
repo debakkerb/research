@@ -27,6 +27,5 @@ module "project" {
   activate_apis = [
     "compute.googleapis.com",
     "logging.googleapis.com",
-    "networkmanagement.googleapis.com"
   ]
 }
