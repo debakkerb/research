@@ -39,7 +39,7 @@ data "google_compute_zones" "zones" {
 
 resource "google_compute_instance_template" "default" {
   project                 = module.project.project_id
-  name                    = "${var.prefix}-instance"
+  name_prefix             = "${var.prefix}-instance-"
   description             = "Instance template for the Apache hosts."
   region                  = var.region
   machine_type            = "n2-standard-2"
@@ -61,12 +61,12 @@ resource "google_compute_instance_template" "default" {
     scopes = ["cloud-platform"]
   }
 
-  tags = ["web-app-backend"]
+  tags = ["web-app-backend", "iap"]
 }
 
 resource "google_compute_instance_template" "canary" {
   project                 = module.project.project_id
-  name                    = "${var.prefix}-canary-instance"
+  name_prefix             = "${var.prefix}-instance-"
   description             = "Instance template for the Apache hosts."
   region                  = var.region
   machine_type            = "n2-standard-2"
@@ -101,7 +101,7 @@ resource "google_compute_region_instance_group_manager" "default" {
 
   auto_healing_policies {
     health_check      = google_compute_health_check.backend_health_check.id
-    initial_delay_sec = 300
+    initial_delay_sec = 120
   }
 
   named_port {
