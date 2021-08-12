@@ -11,7 +11,6 @@ This code deliberately doesn't use modules, to show all the resources that have 
 * [GKE Cluster in Shared VPC](./private_gke_shared_vpc)
 
 ## Ideas
-* Private GKE Cluster in a Shared VPC
 * Windows RDP
 * Log sink export for organizations
 * Organization setup
