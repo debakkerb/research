@@ -11,7 +11,10 @@ Additionally, it's never a good idea to have one **God identity** which is respo
 ### Design
 
 To visualise the approach, this is a small diagram that explains the necessary components:
-// TODO Insert diagram
+
+![Service Account Impersonation](./diagrams/diagram.png)
+
+As you can see, the CI/CD pipeline uses an orchestrator service account, which has very limited IAM permissions.  It can read from the storage bucket that contains the Terraform state and it can impersonate the other service accounts you see on the diagram.  Those individual service accounts possess the permissions to create the necessary infrastructure resources.
 
 ### Layers
 
