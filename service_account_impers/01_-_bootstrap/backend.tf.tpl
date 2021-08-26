@@ -14,14 +14,3 @@
  * limitations under the License.
  */
 
-module "bootstrap_project" {
-  source = "terraform-google-modules/project-factory/google"
-  version = "~> 11.0"
-
-  name = "${var.prefix}-bootstrap"
-  random_project_id = true
-  org_id = var.organization_id
-  folder_id = var.parent_folder_id
-  billing_account = var.billing_account_id
-}
-
