@@ -25,3 +25,33 @@ module "bootstrap_project" {
   billing_account   = var.billing_account_id
 }
 
+resource "google_storage_bucket" "terraform_remote_state_storage" {
+  project                     = module.bootstrap_project.project_id
+  name                        = "${var.prefix}-impers-state"
+  location                    = var.region
+  uniform_bucket_level_access = true
+  force_destroy               = true
+
+  versioning {
+    enabled = true
+  }
+
+  lifecycle_rule {
+    action {
+      type = "Delete"
+    }
+
+    condition {
+      num_newer_versions = 5
+    }
+  }
+}
+
+resource "local_file" "backend_configuration" {
+  filename = "${path.module}/backend.tf"
+  content = templatefile("${path.module}/backend.tf.tpl", {
+    bucket_name                     = google_storage_bucket.terraform_remote_state_storage.name
+    prefix                          = "terraform/state/bootstrap"
+    bootstrap_service_account_email = google_service_account.orchestrator.email
+  })
+}

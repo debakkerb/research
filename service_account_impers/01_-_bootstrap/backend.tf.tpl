@@ -14,3 +14,51 @@
  * limitations under the License.
  */
 
+
+terraform {
+  required_version = "~> 1.0"
+
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 3.81"
+    }
+
+    google-beta = {
+      source  = "hashicorp/google-beta"
+      version = "~> 3.81"
+    }
+  }
+
+  backend "gcs" {
+    bucket = "${bucket_name}"
+    prefix = "${prefix}"
+  }
+}
+
+data "google_service_account_access_token" "default" {
+  provider               = google.impersonated
+  scopes                 = ["userinfo-email", "cloud-platform"]
+  target_service_account = "${bootstrap_service_account_email}"
+  lifetime               = "1800s"
+}
+
+provider "google" {
+  alias = "impersonated"
+}
+
+provider "google-beta" {
+  alias = "impersonated"
+}
+
+provider "google" {
+  region            = var.region
+  zone              = var.zone
+  access_token      = data.google_service_account_access_token.default.access_token
+}
+
+provider "google-beta" {
+  region            = var.region
+  zone              = var.zone
+  access_token      = data.google_service_account_access_token.default.access_token
+}

@@ -18,3 +18,15 @@ variable "organization_id" {}
 variable "billing_account_id" {}
 variable "parent_folder_id" {}
 variable "prefix" {}
+
+variable "region" {
+  description = "Region where resources should be created by default."
+  type        = string
+  default     = "europe-west1"
+}
+
+variable "zone" {
+  description = "Zone where resources should be created by default."
+  type        = string
+  default     = "europe-west1-b"
+}
