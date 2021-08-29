@@ -13,3 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+output "bootstrap_project_id" {
+  value = module.bootstrap_project.project_id
+}
+
+output "bootstrap_orchestrator_email" {
+  value = google_service_account.orchestrator.email
+}
+
+output "bootstrap_orchestrator_id" {
+  value = google_service_account.orchestrator.id
+}
+
+output "project_orchestrator_email" {
+  value = google_service_account.projects.email
+}
+
+output "project_orchestrator_id" {
+  value = google_service_account.projects.id
+}
+
+output "terraform_state_bucket_name" {
+  value = google_storage_bucket.terraform_remote_state_storage.name
+}
