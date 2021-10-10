@@ -17,6 +17,14 @@
 locals {
   pod_secondary_range_name = "${var.prefix}-pod-range"
   svc_secondary_range_name = "${var.prefix}-svc-range"
+
+  cluster_identity_roles = [
+    "roles/logging.logWriter",
+    "roles/monitoring.viewer",
+    "roles/monitoring.metricWriter",
+    "roles/stackdriver.resourceMetadata.writer",
+    "roles/storage.admin"
+  ]
 }
 
 module "project" {
@@ -73,4 +81,13 @@ resource "google_service_account" "workload_identity" {
   description  = "Identity for the sample application deployed on the cluster."
   display_name = "Workload Identity"
 }
+
+resource "google_project_iam_member" "cluster_project_permissions" {
+  for_each = toset(local.cluster_identity_roles)
+  project  = module.project.project_id
+  member   = "serviceAccount:${google_service_account.cluster_identity.email}"
+  role     = each.value
+}
+
+
 

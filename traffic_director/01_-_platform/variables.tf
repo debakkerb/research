@@ -63,3 +63,15 @@ variable "service_cidr_range" {
   type        = string
   default     = "10.2.0.0/16"
 }
+
+variable "master_ipv4_cidr_block" {
+  description = "Master IPV4 CIDR block."
+  type        = string
+  default     = "10.255.0.0/28"
+}
+
+variable "node_machine_type" {
+  description = "Machine type for the nodes."
+  type        = string
+  default     = "n2-standard-8"
+}
