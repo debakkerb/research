@@ -13,5 +13,8 @@ Steps:
 2. Deploy a simple pod.
 3. Create the necessary TD resources to handle traffic and health checks.
 
+## Envoy
+I will be following the Envoy install path.
+
 ## Resources
 

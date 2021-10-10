@@ -25,6 +25,10 @@ locals {
     "roles/stackdriver.resourceMetadata.writer",
     "roles/storage.admin"
   ]
+
+  workload_identity_roles = [
+    "roles/trafficdirector.client"
+  ]
 }
 
 module "project" {
@@ -86,6 +90,13 @@ resource "google_project_iam_member" "cluster_project_permissions" {
   for_each = toset(local.cluster_identity_roles)
   project  = module.project.project_id
   member   = "serviceAccount:${google_service_account.cluster_identity.email}"
+  role     = each.value
+}
+
+resource "google_project_iam_member" "workload_project_permissions" {
+  for_each = toset(local.workload_identity_roles)
+  project  = module.project.project_id
+  member   = "serviceAccount:${google_service_account.workload_identity.email}"
   role     = each.value
 }
 
