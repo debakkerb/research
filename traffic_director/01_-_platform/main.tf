@@ -72,6 +72,14 @@ resource "google_compute_subnetwork" "subnetwork" {
   }
 }
 
+resource "google_compute_firewall" "proxy_access_master" {
+  project   = module.project.project_id
+  name      = "td-master-access"
+  network   = google_compute_network.network.self_link
+  direction = "INGRESS"
+  source_ranges = [""]
+}
+
 resource "google_service_account" "cluster_identity" {
   project      = module.project.project_id
   account_id   = "${var.prefix}-cluster-id"
