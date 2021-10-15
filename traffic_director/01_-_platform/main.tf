@@ -49,7 +49,7 @@ module "project" {
 
 resource "google_compute_network" "network" {
   project                 = module.project.project_id
-  name                    = "${var-prefix}-td-tst-nw"
+  name                    = "${var.prefix}-td-tst-nw"
   auto_create_subnetworks = false
 }
 
@@ -67,18 +67,18 @@ resource "google_compute_subnetwork" "subnetwork" {
   }
 
   secondary_ip_range {
-    ip_cidr_range = local.svc_secondary_range_name
-    range_name    = var.service_cidr_range
+    range_name    = local.svc_secondary_range_name
+    ip_cidr_range = var.service_cidr_range
   }
 }
 
-resource "google_compute_firewall" "proxy_access_master" {
-  project   = module.project.project_id
-  name      = "td-master-access"
-  network   = google_compute_network.network.self_link
-  direction = "INGRESS"
-  source_ranges = [""]
-}
+//resource "google_compute_firewall" "proxy_access_master" {
+//  project   = module.project.project_id
+//  name      = "td-master-access"
+//  network   = google_compute_network.network.self_link
+//  direction = "INGRESS"
+//  source_ranges = [""]
+//}
 
 resource "google_service_account" "cluster_identity" {
   project      = module.project.project_id

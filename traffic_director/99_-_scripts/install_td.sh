@@ -14,3 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+wget -O td-sidecar-injector-xdsv3.tgz https://storage.googleapis.com/traffic-director/td-sidecar-injector-xdsv3.tgz
+tar -xzvf td-sidecar-injector-xdsv3.tgz
+
+sed -i 's/your-project-here/test/g' td-sidecar-injector-xdsv3/specs/01-configmap.yaml
