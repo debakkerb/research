@@ -13,3 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+output "get_credentials" {
+  value = "gcloud container clusters get-credentials ${var.cluster_name} --zone ${var.zone} --project ${module.default.project_id}"
+}

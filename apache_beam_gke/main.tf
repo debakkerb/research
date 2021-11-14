@@ -44,32 +44,6 @@ module "default" {
     "artifactregistry.googleapis.com"
   ]
 }
-
-resource "google_compute_network" "default" {
-  project                 = module.default.project_id
-  name                    = format("%s-%s-%s", var.prefix, var.network_name, random_id.random.hex)
-  auto_create_subnetworks = false
-}
-
-resource "google_compute_subnetwork" "default" {
-  project                  = module.default.project_id
-  ip_cidr_range            = var.cidr_block
-  name                     = format("%s-%s-%s", var.prefix, var.subnet_name, random_id.random.hex)
-  network                  = google_compute_network.default.self_link
-  private_ip_google_access = true
-  region                   = var.region
-
-  secondary_ip_range {
-    ip_cidr_range = var.pod_range_cidr
-    range_name    = var.pod_range_name
-  }
-
-  secondary_ip_range {
-    ip_cidr_range = var.svc_range_cidr
-    range_name    = var.svc_range_name
-  }
-}
-
 resource "google_service_account" "cluster_identity" {
   project    = module.default.project_id
   account_id = "cluster-id"
@@ -150,10 +124,6 @@ resource "google_container_node_pool" "default" {
       "logging-write",
       "monitoring"
     ]
-
-    metadata = {
-      disable-legacy-endpoint = true
-    }
 
     disk_size_gb = 20
     disk_type    = "pd-ssd"
