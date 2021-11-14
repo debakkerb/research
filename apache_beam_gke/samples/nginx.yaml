@@ -1,8 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: shell-demo
-  namespace: flink-operator-system
+  name: nginx
 spec:
   volumes:
     - name: shared-data
