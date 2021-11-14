@@ -13,10 +13,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-resource "null_resource" "install_td_resources" {
-  provisioner "local-exec" {
-    command     = "../99_-_scripts/install_td.sh"
-    working_dir = "../02_-_k8s"
-  }
-}

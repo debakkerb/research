@@ -56,9 +56,9 @@ resource "google_container_cluster" "default" {
   }
 
   timeouts {
-    create = "30m"
-    update = "30m"
-    delete = "30m"
+    create = "45m"
+    update = "45m"
+    delete = "45m"
   }
 
   depends_on = [
@@ -89,9 +89,9 @@ resource "google_container_node_pool" "default" {
   }
 
   timeouts {
-    create = "30m"
-    update = "30m"
-    delete = "30m"
+    create = "45m"
+    update = "45m"
+    delete = "45m"
   }
 
   depends_on = [
