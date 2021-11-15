@@ -72,3 +72,17 @@ resource "google_compute_route" "external_access" {
   network          = google_compute_network.default.name
   next_hop_gateway = "default-internet-gateway"
 }
+
+resource "google_compute_firewall" "master_node_access" {
+  project = module.default.project_id
+  name    = "allow-master-access"
+  network = google_compute_network.default.name
+
+  source_ranges           = [var.master_ipv4_cidr_block]
+  target_service_accounts = [google_service_account.cluster_identity.email]
+
+  allow {
+    protocol = "tcp"
+    ports    = ["443", "8443", "9443", "9402", "10250"]
+  }
+}
