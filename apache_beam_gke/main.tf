@@ -116,7 +116,7 @@ resource "google_container_node_pool" "default" {
 
   node_config {
     image_type   = "cos_containerd"
-    machine_type = "n2-standard-4"
+    machine_type = "n2-standard-16"
 
     service_account = google_service_account.cluster_identity.email
     oauth_scopes = [

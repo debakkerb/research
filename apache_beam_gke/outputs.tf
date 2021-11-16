@@ -17,3 +17,11 @@
 output "get_credentials" {
   value = "gcloud container clusters get-credentials ${var.cluster_name} --zone ${var.zone} --project ${module.default.project_id}"
 }
+
+output "artifact_registry_image_name" {
+  value = "${var.region}-docker.pkg.dev/${module.default.project_id}/${google_artifact_registry_repository.default.name}/flink-cluster"
+}
+
+output "workload_identity" {
+  value = google_service_account.workload_identity.email
+}
