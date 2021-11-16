@@ -9,3 +9,6 @@
 **/credentials.txt
 
 *.lock.hcl
+
+apache_beam_gke/
+apache_beam_gke/images/
