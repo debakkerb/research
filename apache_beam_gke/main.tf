@@ -129,6 +129,7 @@ resource "google_container_node_pool" "default" {
     disk_type    = "pd-ssd"
   }
 
+
   timeouts {
     create = "45m"
     update = "45m"
