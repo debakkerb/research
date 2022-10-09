@@ -10,5 +10,7 @@
 
 *.lock.hcl
 
+.idea
+
 apache_beam_gke/
 apache_beam_gke/images/

@@ -1,0 +1,72 @@
+/**
+ * Copyright 2022 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+variable "billing_account_id" {
+  description = "Billing Account ID that should be associated with the project."
+  type        = string
+}
+
+variable "cors_origin" {
+  description = "Origin for the storage bucket."
+  type        = list(string)
+  default     = []
+}
+
+variable "folder_id" {
+  description = "Folder ID where the project should be created."
+  type        = string
+}
+
+variable "load_balancer_name" {
+  description = "Name of the load balancer."
+  type        = string
+  default     = "lb-static-tst"
+}
+
+variable "region" {
+  description = "Default regions for all resources."
+  type        = string
+  default     = "europe-west1"
+}
+
+variable "organization_id" {
+  description = "Organization ID where the project should be created."
+  type        = string
+}
+
+variable "project_name" {
+  description = "Name of the project."
+  type        = string
+  default     = "static-hosting-tst"
+}
+
+variable "remove_domain_restricted_sharing_policy" {
+  description = "If Domain Restricted Sharing has been enabled, remove for this project."
+  type        = bool
+  default     = false
+}
+
+variable "ssl_domain_names" {
+  description = "List of domains for the SSL certificate."
+  type        = list(string)
+}
+
+variable "storage_bucket_name" {
+  description = "Name of the storage bucket.  This should correspond to the URL where these resources should be accessible."
+  type        = string
+}
+
+
