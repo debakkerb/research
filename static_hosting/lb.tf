@@ -81,36 +81,37 @@ resource "google_compute_url_map" "default" {
   name            = "${var.load_balancer_name}-static-bucket-map"
   default_service = google_compute_backend_bucket.backend.id
 
-#  host_rule {
-#    hosts        = var.ssl_domain_names
-#    path_matcher = "cookie-matcher"
-#  }
-#
-#  path_matcher {
-#    name = "cookie-matcher"
-#
-#    route_rules {
-#      priority = 0
-#      match_rules {
-#        prefix_match = "/"
-#        header_matches {
-#          header_name  = "cookie"
-#          prefix_match = "Cloud-CDN-Cookie"
-#        }
-#      }
-#      service = google_compute_backend_bucket.backend.id
-#    }
-#
-#    route_rules {
-#      priority = 1
-#      match_rules {
-#        prefix_match = "/"
-#      }
-#
-#      service = google_compute_backend_service.default.id
-#    }
-#
-#  }
+  host_rule {
+    hosts        = var.ssl_domain_names
+    path_matcher = "cookie-matcher"
+  }
+
+  path_matcher {
+    name            = "cookie-matcher"
+    default_service = google_compute_backend_bucket.backend.id
+
+    route_rules {
+      priority = 1
+      match_rules {
+        prefix_match = "/"
+        header_matches {
+          header_name  = "cookie"
+          prefix_match = "Cloud-CDN-Cookie"
+        }
+      }
+      service = google_compute_backend_bucket.backend.id
+    }
+
+    route_rules {
+      priority = 2
+      match_rules {
+        prefix_match = "/"
+      }
+
+      service = google_compute_backend_service.default.id
+    }
+
+  }
 }
 
 # HTTP Redirect

@@ -66,4 +66,3 @@ resource "google_iap_web_iam_member" "cloud_run_access" {
   member   = each.value
   role     = "roles/iap.httpsResourceAccessor"
 }
-
