@@ -20,13 +20,16 @@ import (
 	"crypto/hmac"
 	"crypto/sha1"
 	"encoding/base64"
-	"errors"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"time"
+)
+
+var (
+	HOST = os.Getenv("HOST")
 )
 
 func main() {
@@ -46,24 +49,25 @@ func main() {
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
-	urlPath := r.URL.Path
-	host := r.URL.Host
+	cookie, err := generateSignedCookie(w)
 
-	cookie := &http.Cookie{
-		Name:   "Cloud-CDN-Cookie",
-		Value:  "Testing",
-		MaxAge: 300,
+	if err != nil {
+		log.Fatal(err)
 	}
 
+	log.Println(cookie)
 	http.SetCookie(w, cookie)
-	http.Redirect(w, r, host+urlPath, http.StatusFound)
+
+	http.Redirect(w, r, fmt.Sprintf("https://%s%s", HOST, r.URL.Path), http.StatusFound)
 }
 
 func signCookie(urlPrefix string, key []byte, expiration time.Time) (string, error) {
 	keyName := os.Getenv("KEY_NAME")
+	fmt.Printf("Using key %s to sign cookie\n", keyName)
 
 	encodedURLPrefix := base64.URLEncoding.EncodeToString([]byte(urlPrefix))
 	input := fmt.Sprintf("URLPrefix=%s:Expires=%d:KeyName=%s", encodedURLPrefix, expiration.Unix(), keyName)
+	fmt.Printf("Signing cookie with input %s\n", input)
 
 	mac := hmac.New(sha1.New, key)
 	sig := base64.URLEncoding.EncodeToString(mac.Sum(nil))
@@ -77,9 +81,9 @@ func signCookie(urlPrefix string, key []byte, expiration time.Time) (string, err
 }
 
 func readKey() ([]byte, error) {
-	keyValue := os.Getenv("SIGN_KEY")
+	keyValue := []byte(os.Getenv("SIGN_KEY"))
 	d := make([]byte, base64.URLEncoding.DecodedLen(len(keyValue)))
-	n, err := base64.URLEncoding.Decode([]byte(keyValue), d)
+	n, err := base64.URLEncoding.Decode(d, keyValue)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode base64url: %+v", err)
 	}
@@ -87,36 +91,27 @@ func readKey() ([]byte, error) {
 	return d[:n], nil
 }
 
-func generateSignedCookie(w io.Writer) error {
-
-	signingKey := os.Getenv("SIGN_KEY")
-	if signingKey == "" {
-		return errors.New("error while generating signed cookie, signing key not set")
-	}
+func generateSignedCookie(w io.Writer) (*http.Cookie, error) {
 
 	var (
 		domain     = os.Getenv("HOST")
-		path       = "/"
 		expiration = time.Hour * 2
 	)
 
 	key, err := readKey()
 	if err != nil {
-		return err
+		return &http.Cookie{}, err
 	}
 
-	signedValue, err := signCookie(fmt.Sprintf("%s%s", domain, path), key, time.Now().Add(expiration))
+	signedValue, err := signCookie(fmt.Sprintf("https://%s", domain), key, time.Now().Add(expiration))
 
 	cookie := &http.Cookie{
 		Name:   "Cloud-CDN-Cookie",
 		Value:  signedValue,
-		Path:   path,
+		Path:   "/",
 		Domain: domain,
 		MaxAge: int(expiration.Seconds()),
 	}
 
-	log.Println(cookie)
-
-	fmt.Fprintln(w, cookie)
-	return nil
+	return cookie, nil
 }

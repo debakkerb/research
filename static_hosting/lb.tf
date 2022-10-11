@@ -36,6 +36,7 @@ resource "google_compute_managed_ssl_certificate" "default" {
 }
 
 resource "random_id" "url_signature" {
+  count       = var.cdn_signing_key == null ? 1 : 0
   byte_length = 16
 }
 
@@ -44,13 +45,14 @@ resource "google_compute_backend_bucket" "backend" {
   bucket_name = google_storage_bucket.default.name
   name        = "${var.load_balancer_name}-backend-bucket"
   enable_cdn  = true
+
 }
 
 resource "google_compute_backend_bucket_signed_url_key" "signed_key" {
   project        = module.default.project_id
   name           = var.cdn_signing_url_key_name
   backend_bucket = google_compute_backend_bucket.backend.name
-  key_value      = random_id.url_signature.b64_url
+  key_value      = var.cdn_signing_key == null ? random_id.url_signature.0.b64_url : var.cdn_signing_key
 }
 
 resource "google_compute_global_forwarding_rule" "forwarding_rule" {

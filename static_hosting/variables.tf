@@ -40,11 +40,17 @@ variable "cdn_signing_key_secret_name" {
   default     = "cdn-sign-key"
 }
 
+variable "cdn_signing_key" {
+  description = "value for the signing key.  If not set, a random value will be generated"
+  type        = string
+  default     = null
+}
 variable "cdn_signing_url_key_name" {
   description = "Name of the key to sign the CDN URLs"
   type        = string
   default     = "cdn-signed-url-key"
 }
+
 
 variable "cors_origin" {
   description = "Origin for the storage bucket."

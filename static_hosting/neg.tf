@@ -33,6 +33,10 @@ resource "google_compute_backend_service" "default" {
   port_name   = "http"
   timeout_sec = 30
 
+  log_config {
+    enable = true
+  }
+
   backend {
     group       = google_compute_region_network_endpoint_group.default.id
     description = "NEG for the CLoud Run service."

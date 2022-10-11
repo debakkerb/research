@@ -24,7 +24,7 @@ resource "google_secret_manager_secret" "cdn_signing_key" {
 
 resource "google_secret_manager_secret_version" "cdn_signing_key_version" {
   secret      = google_secret_manager_secret.cdn_signing_key.id
-  secret_data = random_id.url_signature.b64_url
+  secret_data = var.cdn_signing_key == null ? random_id.url_signature.0.b64_url : var.cdn_signing_key
 }
 
 resource "google_secret_manager_secret_iam_member" "cdn_signing_key_access" {

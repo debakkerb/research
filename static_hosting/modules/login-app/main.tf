@@ -19,6 +19,7 @@ resource "null_resource" "build_and_push_image" {
     build_container_image_sha = filesha256("${path.module}/src/build_container.sh")
     go_script_sha             = filesha256("${path.module}/src/main.go")
     go_dependencies_sha       = filesha256("${path.module}/src/go.mod")
+    image_tag                 = var.image_tag
   }
 
   provisioner "local-exec" {
