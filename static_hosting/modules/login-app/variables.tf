@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-terraform {
-  required_version = "~> 1.3.0"
-
-  required_providers {
-    google      = ">= 4.39.0"
-    google-beta = ">= 4.39.0"
-  }
+variable "image_name" {
+  description = "Name of the container image."
+  type        = string
 }
+
+variable "project_id" {
+  description = "Project ID where the image will be pushed and stored."
+  type        = string
+}
+

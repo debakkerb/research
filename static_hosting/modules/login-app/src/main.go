@@ -1,3 +1,5 @@
+package main
+
 /**
  * Copyright 2022 Google LLC
  *
@@ -14,11 +16,29 @@
  * limitations under the License.
  */
 
-terraform {
-  required_version = "~> 1.3.0"
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+)
 
-  required_providers {
-    google      = ">= 4.39.0"
-    google-beta = ">= 4.39.0"
-  }
+func main() {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", login)
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+		log.Printf("Defaulting to port %s", port)
+	}
+
+	log.Printf("Listening on port %s", port)
+	if err := http.ListenAndServe(":"+port, mux); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func login(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Welcome %s", "test")
 }

@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-terraform {
-  required_version = "~> 1.3.0"
+resource "null_resource" "build_and_push_image" {
+  triggers = {
+    build_container_image_sha = filesha256("${path.module}/src/build_container.sh")
+    go_script_sha             = filesha256("${path.module}/src/main.go")
+    go_dependencies_sha       = filesha256("${path.module}/src/go.mod")
+  }
 
-  required_providers {
-    google      = ">= 4.39.0"
-    google-beta = ">= 4.39.0"
+  provisioner "local-exec" {
+    working_dir = "${path.module}/src"
+    command     = "./build_container.sh ${var.project_id} ${var.image_name}"
   }
 }

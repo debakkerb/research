@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-terraform {
-  required_version = "~> 1.3.0"
+resource "google_iap_brand" "project_brand" {
+  project           = module.default.project_id
+  application_title = var.brand_application_title
+  support_email     = var.brand_support_email
+}
 
-  required_providers {
-    google      = ">= 4.39.0"
-    google-beta = ">= 4.39.0"
-  }
+resource "google_iap_client" "project_oauth_client" {
+  brand        = google_iap_brand.project_brand.name
+  display_name = var.iap_client_display_name
 }

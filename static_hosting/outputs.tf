@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 
-output "load_balancer_ip_address" {
-  value = google_compute_global_address.https_lb_ip_address.address
+output "image_name" {
+  value = local.full_image_name
 }
+
+#output "load_balancer_ip_address" {
+#  value = google_compute_global_address.https_lb_ip_address.address
+#}
 
 output "project_id" {
   value = module.default.project_id

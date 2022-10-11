@@ -13,9 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+variable "artifact_registry_repository_id" {
+  description = "ID of the Artifact Registry repository"
+  type        = string
+  default     = "login-app-registry"
+}
 
 variable "billing_account_id" {
   description = "Billing Account ID that should be associated with the project."
+  type        = string
+}
+
+variable "brand_application_title" {
+  description = "Application title for the IAP configuration."
+  type        = string
+}
+
+variable "brand_support_email" {
+  description = "Support email address for the IAP configuration."
   type        = string
 }
 
@@ -30,10 +45,26 @@ variable "folder_id" {
   type        = string
 }
 
+variable "iap_client_display_name" {
+  description = "Display name for the IAP client."
+  type        = string
+}
+
 variable "load_balancer_name" {
   description = "Name of the load balancer."
   type        = string
   default     = "lb-static-tst"
+}
+
+variable "login_service_name" {
+  description = "Name of the Cloud Run service that will create the cookie."
+  type        = string
+  default     = "login-service"
+}
+
+variable "login_service_access" {
+  description = "A list of IAM identities who can access the service.  This can be a list of user:, groups:, domain:, ..."
+  type        = set(string)
 }
 
 variable "region" {

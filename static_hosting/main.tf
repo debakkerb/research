@@ -27,6 +27,10 @@ module "default" {
   activate_apis = [
     "storage.googleapis.com",
     "compute.googleapis.com",
+    "run.googleapis.com",
+    "iap.googleapis.com",
+    "artifactregistry.googleapis.com",
+    "cloudbuild.googleapis.com"
   ]
 }
 
@@ -67,8 +71,8 @@ resource "google_storage_bucket_iam_member" "cdn_access" {
   member = "serviceAccount:service-${module.default.project_number}@cloud-cdn-fill.iam.gserviceaccount.com"
   role   = "roles/storage.objectViewer"
 
-  depends_on = [
-    google_compute_backend_bucket_signed_url_key.signed_key
-  ]
+#  depends_on = [
+#    google_compute_backend_bucket_signed_url_key.signed_key
+#  ]
 }
 
