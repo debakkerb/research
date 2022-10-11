@@ -30,7 +30,8 @@ module "default" {
     "run.googleapis.com",
     "iap.googleapis.com",
     "artifactregistry.googleapis.com",
-    "cloudbuild.googleapis.com"
+    "cloudbuild.googleapis.com",
+    "secretmanager.googleapis.com"
   ]
 }
 

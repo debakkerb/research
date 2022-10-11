@@ -34,6 +34,18 @@ variable "brand_support_email" {
   type        = string
 }
 
+variable "cdn_signing_key_secret_name" {
+  description = "Name of the secret where the signing key will be stored for the CDN cookie."
+  type        = string
+  default     = "cdn-sign-key"
+}
+
+variable "cdn_signing_url_key_name" {
+  description = "Name of the key to sign the CDN URLs"
+  type        = string
+  default     = "cdn-signed-url-key"
+}
+
 variable "cors_origin" {
   description = "Origin for the storage bucket."
   type        = list(string)

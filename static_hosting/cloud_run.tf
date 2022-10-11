@@ -31,6 +31,30 @@ resource "google_cloud_run_service" "login_service" {
       service_account_name = google_service_account.service_identity.email
       containers {
         image = "${local.full_image_name}:${local.image_tag}"
+        env {
+          name = "SIGN_KEY"
+          value_from {
+            secret_key_ref {
+              name = google_secret_manager_secret.cdn_signing_key.secret_id
+              key  = "latest"
+            }
+          }
+        }
+
+        env {
+          name  = "KEY_NAME"
+          value = var.cdn_signing_url_key_name
+        }
+
+        env {
+          name  = "HOST"
+          value = var.ssl_domain_names.0
+        }
+
+        env {
+          name  = "PROJECT_ID"
+          value = module.default.project_id
+        }
       }
     }
   }

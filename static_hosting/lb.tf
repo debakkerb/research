@@ -48,7 +48,7 @@ resource "google_compute_backend_bucket" "backend" {
 
 resource "google_compute_backend_bucket_signed_url_key" "signed_key" {
   project        = module.default.project_id
-  name           = "cdn-signed-url-key"
+  name           = var.cdn_signing_url_key_name
   backend_bucket = google_compute_backend_bucket.backend.name
   key_value      = random_id.url_signature.b64_url
 }
