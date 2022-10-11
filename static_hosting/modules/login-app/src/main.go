@@ -17,7 +17,6 @@ package main
  */
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -40,5 +39,18 @@ func main() {
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Welcome %s", r.URL.Path)
+	urlPath := r.URL.Path
+	host := r.URL.Host
+
+	cookie := &http.Cookie{
+		Name:   "Cloud-CDN-Cookie",
+		Value:  "Testing",
+		MaxAge: 300,
+	}
+
+	log.Printf("Url Path: %s", urlPath)
+	log.Printf("Host: %s", host)
+
+	http.SetCookie(w, cookie)
+	http.Redirect(w, r, host+urlPath, http.StatusFound)
 }
