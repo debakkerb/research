@@ -17,6 +17,11 @@
 locals {
   full_image_name      = "${var.region}-docker.pkg.dev/${module.default.project_id}/${google_artifact_registry_repository.default.name}/static-hosting-login"
   cloud_build_identity = "${module.default.project_number}@cloudbuild.gserviceaccount.com"
+  image_tag            = var.image_tag == null ? data.external.git_tag.result.tag : var.image_tag
+}
+
+data "external" "git_tag" {
+  program = ["bash", "${path.module}/scripts/img-tag.sh"]
 }
 
 resource "google_artifact_registry_repository_iam_member" "cloud_build_access" {
@@ -41,4 +46,5 @@ module "login_app_image" {
 
   project_id = module.default.project_id
   image_name = local.full_image_name
+  image_tag  = local.image_tag
 }

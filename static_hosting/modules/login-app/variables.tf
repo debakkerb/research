@@ -19,6 +19,11 @@ variable "image_name" {
   type        = string
 }
 
+variable "image_tag" {
+  description = "Tag to be used for the image."
+  type        = string
+}
+
 variable "project_id" {
   description = "Project ID where the image will be pushed and stored."
   type        = string

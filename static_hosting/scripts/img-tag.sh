@@ -14,9 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-PROJECT_ID=$1
-IMAGE_NAME=$2
-IMAGE_TAG=$3
+set -e
 
-gcloud config set project ${PROJECT_ID}
-gcloud builds submit . --pack image=${IMAGE_NAME}:${IMAGE_TAG}
+TAG=$(git describe --always --dirty)
+
+jq -n --arg tag "$TAG" '{"tag": $tag}'

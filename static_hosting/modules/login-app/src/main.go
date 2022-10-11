@@ -40,5 +40,5 @@ func main() {
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Welcome %s", "test")
+	fmt.Fprintf(w, "Welcome %s", r.URL.Path)
 }

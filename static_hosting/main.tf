@@ -54,10 +54,16 @@ resource "google_storage_bucket" "default" {
   }
 }
 
-resource "google_storage_bucket_object" "index" {
-  name   = "index.html"
+resource "google_storage_bucket_object" "module_one_page" {
+  name   = "module_one.html"
   bucket = google_storage_bucket.default.name
-  source = "${path.module}/static/index.html"
+  source = "${path.module}/static/module_one.html"
+}
+
+resource "google_storage_bucket_object" "module_two_page" {
+  name   = "module_two.html"
+  bucket = google_storage_bucket.default.name
+  source = "${path.module}/static/module_two.html"
 }
 
 resource "google_storage_bucket_iam_member" "public_access" {
@@ -71,8 +77,8 @@ resource "google_storage_bucket_iam_member" "cdn_access" {
   member = "serviceAccount:service-${module.default.project_number}@cloud-cdn-fill.iam.gserviceaccount.com"
   role   = "roles/storage.objectViewer"
 
-#  depends_on = [
-#    google_compute_backend_bucket_signed_url_key.signed_key
-#  ]
+  depends_on = [
+    google_compute_backend_bucket_signed_url_key.signed_key
+  ]
 }
 

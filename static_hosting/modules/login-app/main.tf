@@ -23,6 +23,6 @@ resource "null_resource" "build_and_push_image" {
 
   provisioner "local-exec" {
     working_dir = "${path.module}/src"
-    command     = "./build_container.sh ${var.project_id} ${var.image_name}"
+    command     = "./build_container.sh ${var.project_id} ${var.image_name} ${var.image_tag}"
   }
 }

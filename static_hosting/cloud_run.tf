@@ -30,7 +30,7 @@ resource "google_cloud_run_service" "login_service" {
     spec {
       service_account_name = google_service_account.service_identity.email
       containers {
-        image = local.full_image_name
+        image = "${local.full_image_name}:${local.image_tag}"
       }
     }
   }

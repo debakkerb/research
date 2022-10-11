@@ -50,6 +50,12 @@ variable "iap_client_display_name" {
   type        = string
 }
 
+variable "image_tag" {
+  description = "Tag to be used for the image. If not set, the Git description will be used."
+  type        = string
+  default     = null
+}
+
 variable "load_balancer_name" {
   description = "Name of the load balancer."
   type        = string
