@@ -15,7 +15,7 @@
  */
 
 resource "google_iap_brand" "project_brand" {
-  project           = module.default.project_id
+  project           = module.project.project_id
   application_title = var.brand_application_title
   support_email     = var.brand_support_email
 }

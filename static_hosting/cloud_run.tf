@@ -15,12 +15,12 @@
  */
 
 resource "google_service_account" "service_identity" {
-  project    = module.default.project_id
+  project    = module.project.project_id
   account_id = "static-host-svc-id"
 }
 
 resource "google_cloud_run_service" "login_service" {
-  project  = module.default.project_id
+  project  = module.project.project_id
   name     = var.login_service_name
   location = var.region
 
@@ -53,7 +53,7 @@ resource "google_cloud_run_service" "login_service" {
 
         env {
           name  = "PROJECT_ID"
-          value = module.default.project_id
+          value = module.project.project_id
         }
       }
     }
@@ -78,7 +78,7 @@ data "google_iam_policy" "allow_no_auth" {
 }
 
 resource "google_cloud_run_service_iam_policy" "allow_no_auth_policy" {
-  project     = module.default.project_id
+  project     = module.project.project_id
   location    = var.region
   policy_data = data.google_iam_policy.allow_no_auth.policy_data
   service     = google_cloud_run_service.login_service.name
@@ -86,7 +86,7 @@ resource "google_cloud_run_service_iam_policy" "allow_no_auth_policy" {
 
 resource "google_iap_web_iam_member" "cloud_run_access" {
   for_each = var.login_service_access
-  project  = module.default.project_id
+  project  = module.project.project_id
   member   = each.value
   role     = "roles/iap.httpsResourceAccessor"
 }

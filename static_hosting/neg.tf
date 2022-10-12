@@ -16,7 +16,7 @@
 
 resource "google_compute_region_network_endpoint_group" "default" {
   provider              = google-beta
-  project               = module.default.project_id
+  project               = module.project.project_id
   name                  = "${var.load_balancer_name}-managed-neg"
   network_endpoint_type = "SERVERLESS"
   region                = var.region
@@ -27,7 +27,7 @@ resource "google_compute_region_network_endpoint_group" "default" {
 }
 
 resource "google_compute_backend_service" "default" {
-  project     = module.default.project_id
+  project     = module.project.project_id
   name        = "${var.load_balancer_name}-managed-neg-backend"
   protocol    = "HTTP"
   port_name   = "http"

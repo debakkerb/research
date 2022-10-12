@@ -15,7 +15,7 @@
  */
 
 resource "google_compute_global_address" "https_lb_ip_address" {
-  project      = module.default.project_id
+  project      = module.project.project_id
   name         = "${var.load_balancer_name}-address"
   ip_version   = "IPV4"
   description  = "Public IP address of the load balancer."
@@ -23,7 +23,7 @@ resource "google_compute_global_address" "https_lb_ip_address" {
 }
 
 resource "google_compute_managed_ssl_certificate" "default" {
-  project = module.default.project_id
+  project = module.project.project_id
   name    = "storage-ssl-cert"
 
   managed {
@@ -41,7 +41,7 @@ resource "random_id" "url_signature" {
 }
 
 resource "google_compute_backend_bucket" "backend" {
-  project     = module.default.project_id
+  project     = module.project.project_id
   bucket_name = google_storage_bucket.default.name
   name        = "${var.load_balancer_name}-backend-bucket"
   enable_cdn  = true
@@ -49,14 +49,14 @@ resource "google_compute_backend_bucket" "backend" {
 }
 
 resource "google_compute_backend_bucket_signed_url_key" "signed_key" {
-  project        = module.default.project_id
+  project        = module.project.project_id
   name           = var.cdn_signing_url_key_name
   backend_bucket = google_compute_backend_bucket.backend.name
   key_value      = var.cdn_signing_key == null ? random_id.url_signature.0.b64_url : var.cdn_signing_key
 }
 
 resource "google_compute_global_forwarding_rule" "forwarding_rule" {
-  project    = module.default.project_id
+  project    = module.project.project_id
   name       = "${var.load_balancer_name}-fwd-rule"
   target     = google_compute_target_https_proxy.static_proxy.id
   ip_address = google_compute_global_address.https_lb_ip_address.self_link
@@ -64,14 +64,14 @@ resource "google_compute_global_forwarding_rule" "forwarding_rule" {
 }
 
 resource "google_compute_ssl_policy" "ssl_policy" {
-  project         = module.default.project_id
+  project         = module.project.project_id
   name            = "${var.load_balancer_name}-ssl-policy"
   profile         = "MODERN"
   min_tls_version = "TLS_1_2"
 }
 
 resource "google_compute_target_https_proxy" "static_proxy" {
-  project          = module.default.project_id
+  project          = module.project.project_id
   name             = "${var.load_balancer_name}-target-proxy"
   ssl_certificates = [google_compute_managed_ssl_certificate.default.id]
   url_map          = google_compute_url_map.default.id
@@ -79,7 +79,7 @@ resource "google_compute_target_https_proxy" "static_proxy" {
 }
 
 resource "google_compute_url_map" "default" {
-  project         = module.default.project_id
+  project         = module.project.project_id
   name            = "${var.load_balancer_name}-static-bucket-map"
   default_service = google_compute_backend_bucket.backend.id
 
@@ -93,7 +93,7 @@ resource "google_compute_url_map" "default" {
     default_service = google_compute_backend_bucket.backend.id
 
     route_rules {
-      priority = 1
+      priority = 0
       match_rules {
         prefix_match = "/"
         header_matches {
@@ -105,20 +105,19 @@ resource "google_compute_url_map" "default" {
     }
 
     route_rules {
-      priority = 2
+      priority = 1
       match_rules {
         prefix_match = "/"
       }
 
       service = google_compute_backend_service.default.id
     }
-
   }
 }
 
 # HTTP Redirect
 resource "google_compute_url_map" "static_http_map" {
-  project = module.default.project_id
+  project = module.project.project_id
   name    = "${var.load_balancer_name}-http-url-map"
 
   default_url_redirect {
@@ -128,13 +127,13 @@ resource "google_compute_url_map" "static_http_map" {
 }
 
 resource "google_compute_target_http_proxy" "default" {
-  project = module.default.project_id
+  project = module.project.project_id
   name    = "${var.load_balancer_name}-static-http-proxy"
   url_map = google_compute_url_map.static_http_map.id
 }
 
 resource "google_compute_global_forwarding_rule" "static_http" {
-  project    = module.default.project_id
+  project    = module.project.project_id
   name       = "${var.load_balancer_name}-forwarding-rule-http"
   target     = google_compute_target_http_proxy.default.id
   port_range = "80"

@@ -15,7 +15,7 @@
  */
 
 resource "google_secret_manager_secret" "cdn_signing_key" {
-  project   = module.default.project_id
+  project   = module.project.project_id
   secret_id = var.cdn_signing_key_secret_name
   replication {
     automatic = true
@@ -28,7 +28,7 @@ resource "google_secret_manager_secret_version" "cdn_signing_key_version" {
 }
 
 resource "google_secret_manager_secret_iam_member" "cdn_signing_key_access" {
-  project   = module.default.project_id
+  project   = module.project.project_id
   member    = "serviceAccount:${google_service_account.service_identity.email}"
   role      = "roles/secretmanager.secretAccessor"
   secret_id = google_secret_manager_secret.cdn_signing_key.id

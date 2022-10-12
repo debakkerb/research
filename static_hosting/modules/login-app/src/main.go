@@ -95,7 +95,7 @@ func generateSignedCookie(w io.Writer) (*http.Cookie, error) {
 
 	var (
 		domain     = os.Getenv("HOST")
-		expiration = time.Hour * 2
+		expiration = time.Hour * 24
 	)
 
 	key, err := readKey()

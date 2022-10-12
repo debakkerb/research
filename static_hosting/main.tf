@@ -14,7 +14,28 @@
  * limitations under the License.
  */
 
-module "default" {
+module "test_project" {
+  source  = "terraform-google-modules/project-factory/google"
+  version = "~> 14.0"
+
+  name              = "static-host-manual-tst"
+  random_project_id = true
+  org_id            = var.organization_id
+  folder_id         = var.folder_id
+  billing_account   = var.billing_account_id
+
+  activate_apis = [
+    "storage.googleapis.com",
+    "compute.googleapis.com",
+    "run.googleapis.com",
+    "iap.googleapis.com",
+    "artifactregistry.googleapis.com",
+    "cloudbuild.googleapis.com",
+    "secretmanager.googleapis.com"
+  ]
+}
+
+module "project" {
   source  = "terraform-google-modules/project-factory/google"
   version = "~> 14.0"
 
@@ -36,8 +57,8 @@ module "default" {
 }
 
 resource "google_storage_bucket" "default" {
-  project                     = module.default.project_id
-  name                        = var.storage_bucket_name
+  project                     = module.project.project_id
+  name                        = "${module.project.project_id}-static-hosting"
   location                    = var.region
   force_destroy               = true
   uniform_bucket_level_access = true
@@ -56,26 +77,20 @@ resource "google_storage_bucket" "default" {
 }
 
 resource "google_storage_bucket_object" "module_one_page" {
-  name   = "module_one.html"
+  name   = "module_one/index.html"
   bucket = google_storage_bucket.default.name
   source = "${path.module}/static/module_one.html"
 }
 
 resource "google_storage_bucket_object" "module_two_page" {
-  name   = "module_two.html"
+  name   = "module_two/index.html"
   bucket = google_storage_bucket.default.name
   source = "${path.module}/static/module_two.html"
 }
 
-resource "google_storage_bucket_iam_member" "public_access" {
-  bucket = google_storage_bucket.default.name
-  member = "allUsers"
-  role   = "roles/storage.objectViewer"
-}
-
 resource "google_storage_bucket_iam_member" "cdn_access" {
   bucket = google_storage_bucket.default.name
-  member = "serviceAccount:service-${module.default.project_number}@cloud-cdn-fill.iam.gserviceaccount.com"
+  member = "serviceAccount:service-${module.project.project_number}@cloud-cdn-fill.iam.gserviceaccount.com"
   role   = "roles/storage.objectViewer"
 
   depends_on = [
