@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-resource "google_compute_region_network_endpoint_group" "default" {
+resource "google_compute_region_network_endpoint_group" "login_app_endpoint_group" {
   provider              = google-beta
   project               = module.project.project_id
   name                  = "${var.load_balancer_name}-managed-neg"
@@ -26,7 +26,7 @@ resource "google_compute_region_network_endpoint_group" "default" {
   }
 }
 
-resource "google_compute_backend_service" "default" {
+resource "google_compute_backend_service" "login_app_service" {
   project     = module.project.project_id
   name        = "${var.load_balancer_name}-managed-neg-backend"
   protocol    = "HTTP"
@@ -38,7 +38,7 @@ resource "google_compute_backend_service" "default" {
   }
 
   backend {
-    group       = google_compute_region_network_endpoint_group.default.id
+    group       = google_compute_region_network_endpoint_group.login_app_endpoint_group.id
     description = "NEG for the CLoud Run service."
   }
 

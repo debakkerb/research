@@ -15,7 +15,7 @@
  */
 
 locals {
-  full_image_name      = "${var.region}-docker.pkg.dev/${module.project.project_id}/${google_artifact_registry_repository.default.name}/static-hosting-login"
+  full_image_name      = "${var.region}-docker.pkg.dev/${module.project.project_id}/${google_artifact_registry_repository.login_app_registry.name}/static-hosting-login"
   cloud_build_identity = "${module.project.project_number}@cloudbuild.gserviceaccount.com"
   image_tag            = var.image_tag == null ? data.external.git_tag.result.tag : var.image_tag
 }
@@ -27,12 +27,12 @@ data "external" "git_tag" {
 resource "google_artifact_registry_repository_iam_member" "cloud_build_access" {
   project    = module.project.project_id
   member     = "serviceAccount:${local.cloud_build_identity}"
-  repository = google_artifact_registry_repository.default.name
+  repository = google_artifact_registry_repository.login_app_registry.name
   role       = "roles/artifactregistry.writer"
   location   = var.region
 }
 
-resource "google_artifact_registry_repository" "default" {
+resource "google_artifact_registry_repository" "login_app_registry" {
   provider      = google-beta
   project       = module.project.project_id
   format        = "DOCKER"

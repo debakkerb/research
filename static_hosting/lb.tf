@@ -22,7 +22,7 @@ resource "google_compute_global_address" "https_lb_ip_address" {
   address_type = "EXTERNAL"
 }
 
-resource "google_compute_managed_ssl_certificate" "default" {
+resource "google_compute_managed_ssl_certificate" "lb_ssl_certificate" {
   project = module.project.project_id
   name    = "storage-ssl-cert"
 
@@ -42,7 +42,7 @@ resource "random_id" "url_signature" {
 
 resource "google_compute_backend_bucket" "backend" {
   project     = module.project.project_id
-  bucket_name = google_storage_bucket.default.name
+  bucket_name = google_storage_bucket.static_asset_storage_bucket.name
   name        = "${var.load_balancer_name}-backend-bucket"
   enable_cdn  = true
 
@@ -73,14 +73,14 @@ resource "google_compute_ssl_policy" "ssl_policy" {
 resource "google_compute_target_https_proxy" "static_proxy" {
   project          = module.project.project_id
   name             = "${var.load_balancer_name}-target-proxy"
-  ssl_certificates = [google_compute_managed_ssl_certificate.default.id]
-  url_map          = google_compute_url_map.default.id
+  ssl_certificates = [google_compute_managed_ssl_certificate.lb_ssl_certificate.id]
+  url_map          = google_compute_url_map.lb_url_map.id
   ssl_policy       = google_compute_ssl_policy.ssl_policy.id
 }
 
-resource "google_compute_url_map" "default" {
+resource "google_compute_url_map" "lb_url_map" {
   project         = module.project.project_id
-  name            = "${var.load_balancer_name}-static-bucket-map"
+  name            = "${var.load_balancer_name}-static-bucket-map-2"
   default_service = google_compute_backend_bucket.backend.id
 
   host_rule {
@@ -93,7 +93,7 @@ resource "google_compute_url_map" "default" {
     default_service = google_compute_backend_bucket.backend.id
 
     route_rules {
-      priority = 0
+      priority = 1
       match_rules {
         prefix_match = "/"
         header_matches {
@@ -105,13 +105,17 @@ resource "google_compute_url_map" "default" {
     }
 
     route_rules {
-      priority = 1
+      priority = 2
       match_rules {
         prefix_match = "/"
       }
 
-      service = google_compute_backend_service.default.id
+      service = google_compute_backend_service.login_app_service.id
     }
+  }
+
+  lifecycle {
+    create_before_destroy = false
   }
 }
 
@@ -126,16 +130,16 @@ resource "google_compute_url_map" "static_http_map" {
   }
 }
 
-resource "google_compute_target_http_proxy" "default" {
+resource "google_compute_target_http_proxy" "http_to_https_redirect" {
   project = module.project.project_id
-  name    = "${var.load_balancer_name}-static-http-proxy"
+  name    = "${var.load_balancer_name}-static-http-proxy-2"
   url_map = google_compute_url_map.static_http_map.id
 }
 
 resource "google_compute_global_forwarding_rule" "static_http" {
   project    = module.project.project_id
   name       = "${var.load_balancer_name}-forwarding-rule-http"
-  target     = google_compute_target_http_proxy.default.id
+  target     = google_compute_target_http_proxy.http_to_https_redirect.id
   port_range = "80"
   ip_address = google_compute_global_address.https_lb_ip_address.id
 }
