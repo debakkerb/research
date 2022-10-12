@@ -57,7 +57,13 @@ func login(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, cookie)
 	r.AddCookie(cookie)
 
-	http.Redirect(w, r, fmt.Sprintf("https://%s%s", HOST, r.URL.Path), http.StatusFound)
+	path := r.URL.Path
+
+	if path == "/" {
+		path += "index.html"
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("https://%s%s", HOST, path), http.StatusFound)
 }
 
 func signCookie(urlPrefix string, key []byte, expiration time.Time) (string, error) {

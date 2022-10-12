@@ -44,7 +44,7 @@ resource "google_storage_bucket" "static_asset_storage_bucket" {
 
   website {
     main_page_suffix = "index.html"
-    not_found_page   = "index.html"
+    not_found_page   = "403.html"
   }
 
   cors {
@@ -71,6 +71,12 @@ resource "google_storage_bucket_object" "index_page" {
   bucket = google_storage_bucket.static_asset_storage_bucket.name
   name   = "index.html"
   source = "${path.module}/static/index.html"
+}
+
+resource "google_storage_bucket_object" "not_found_page" {
+  bucket = google_storage_bucket.static_asset_storage_bucket.name
+  name   = "403.html"
+  source = "${path.module}/static/403.html"
 }
 
 resource "google_storage_bucket_iam_member" "cdn_access" {
