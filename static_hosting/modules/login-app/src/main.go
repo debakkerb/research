@@ -48,15 +48,12 @@ func main() {
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
-	log.Printf("Requesting URL: %s:%s", r.URL.Host, r.URL.Path)
-
 	cookie, err := generateSignedCookie()
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Println(cookie)
 	http.SetCookie(w, cookie)
 	r.AddCookie(cookie)
 
@@ -65,11 +62,9 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 func signCookie(urlPrefix string, key []byte, expiration time.Time) (string, error) {
 	keyName := os.Getenv("KEY_NAME")
-	fmt.Printf("Using key %s to sign cookie\n", keyName)
 
 	encodedURLPrefix := base64.URLEncoding.EncodeToString([]byte(urlPrefix))
 	input := fmt.Sprintf("URLPrefix=%s:Expires=%d:KeyName=%s", encodedURLPrefix, expiration.Unix(), keyName)
-	fmt.Printf("Signing cookie with input %s\n", input)
 
 	mac := hmac.New(sha1.New, key)
 	mac.Write([]byte(input))
@@ -111,7 +106,6 @@ func generateSignedCookie() (*http.Cookie, error) {
 	cookie := &http.Cookie{
 		Name:   "Cloud-CDN-Cookie",
 		Value:  signedValue,
-		Path:   "/",
 		Domain: domain,
 		MaxAge: int(expiration.Seconds()),
 	}
