@@ -21,7 +21,6 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -49,7 +48,9 @@ func main() {
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
-	cookie, err := generateSignedCookie(w)
+	log.Printf("Requesting URL: %s:%s", r.URL.Host, r.URL.Path)
+
+	cookie, err := generateSignedCookie()
 
 	if err != nil {
 		log.Fatal(err)
@@ -57,6 +58,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 	log.Println(cookie)
 	http.SetCookie(w, cookie)
+	r.AddCookie(cookie)
 
 	http.Redirect(w, r, fmt.Sprintf("https://%s%s", HOST, r.URL.Path), http.StatusFound)
 }
@@ -70,6 +72,7 @@ func signCookie(urlPrefix string, key []byte, expiration time.Time) (string, err
 	fmt.Printf("Signing cookie with input %s\n", input)
 
 	mac := hmac.New(sha1.New, key)
+	mac.Write([]byte(input))
 	sig := base64.URLEncoding.EncodeToString(mac.Sum(nil))
 
 	signedValue := fmt.Sprintf("%s:Signature=%s",
@@ -91,11 +94,11 @@ func readKey() ([]byte, error) {
 	return d[:n], nil
 }
 
-func generateSignedCookie(w io.Writer) (*http.Cookie, error) {
+func generateSignedCookie() (*http.Cookie, error) {
 
 	var (
 		domain     = os.Getenv("HOST")
-		expiration = time.Hour * 24
+		expiration = time.Hour * 12
 	)
 
 	key, err := readKey()

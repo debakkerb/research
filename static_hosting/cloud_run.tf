@@ -66,7 +66,8 @@ resource "google_cloud_run_service" "login_service" {
   }
 
   depends_on = [
-    module.login_app_image
+    module.login_app_image,
+    google_compute_backend_bucket_signed_url_key.signed_key
   ]
 }
 

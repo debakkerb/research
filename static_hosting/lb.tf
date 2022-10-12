@@ -35,11 +35,6 @@ resource "google_compute_managed_ssl_certificate" "lb_ssl_certificate" {
   }
 }
 
-resource "random_id" "url_signature" {
-  count       = var.cdn_signing_key == null ? 1 : 0
-  byte_length = 16
-}
-
 resource "google_compute_backend_bucket" "backend" {
   project     = module.project.project_id
   bucket_name = google_storage_bucket.static_asset_storage_bucket.name
@@ -52,7 +47,7 @@ resource "google_compute_backend_bucket_signed_url_key" "signed_key" {
   project        = module.project.project_id
   name           = var.cdn_signing_url_key_name
   backend_bucket = google_compute_backend_bucket.backend.name
-  key_value      = var.cdn_signing_key == null ? random_id.url_signature.0.b64_url : var.cdn_signing_key
+  key_value      = var.cdn_signing_key
 }
 
 resource "google_compute_global_forwarding_rule" "forwarding_rule" {
@@ -80,7 +75,7 @@ resource "google_compute_target_https_proxy" "static_proxy" {
 
 resource "google_compute_url_map" "lb_url_map" {
   project         = module.project.project_id
-  name            = "${var.load_balancer_name}-static-bucket-map-2"
+  name            = "${var.load_balancer_name}-static-bucket-map"
   default_service = google_compute_backend_bucket.backend.id
 
   host_rule {
@@ -114,9 +109,6 @@ resource "google_compute_url_map" "lb_url_map" {
     }
   }
 
-  lifecycle {
-    create_before_destroy = false
-  }
 }
 
 # HTTP Redirect
@@ -132,7 +124,7 @@ resource "google_compute_url_map" "static_http_map" {
 
 resource "google_compute_target_http_proxy" "http_to_https_redirect" {
   project = module.project.project_id
-  name    = "${var.load_balancer_name}-static-http-proxy-2"
+  name    = "${var.load_balancer_name}-static-http-proxy"
   url_map = google_compute_url_map.static_http_map.id
 }
 
