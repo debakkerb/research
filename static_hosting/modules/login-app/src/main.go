@@ -56,7 +56,6 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 	cookie, err := generateSignedCookie(path)
 	http.SetCookie(w, cookie)
-	r.AddCookie(cookie)
 
 	if err != nil {
 		log.Fatal(err)
