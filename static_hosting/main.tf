@@ -35,6 +35,13 @@ module "project" {
   ]
 }
 
+resource "google_project_iam_member" "project_viewers" {
+  for_each = var.project_viewers
+  project  = module.project.project_id
+  member   = each.value
+  role     = "roles/viewer"
+}
+
 resource "google_storage_bucket" "static_asset_storage_bucket" {
   project                     = module.project.project_id
   name                        = "${module.project.project_id}-static-hosting"

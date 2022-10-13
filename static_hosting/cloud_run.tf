@@ -81,9 +81,10 @@ resource "google_cloud_run_service_iam_policy" "allow_no_auth_policy" {
   service     = google_cloud_run_service.login_service.name
 }
 
-resource "google_iap_web_iam_member" "cloud_run_access" {
-  for_each = var.login_service_access
-  project  = module.project.project_id
-  member   = each.value
-  role     = "roles/iap.httpsResourceAccessor"
+resource "google_iap_web_backend_service_iam_member" "cloud_run_access" {
+  for_each            = var.login_service_access
+  project             = module.project.project_id
+  member              = each.value
+  role                = "roles/iap.httpsResourceAccessor"
+  web_backend_service = google_compute_backend_service.login_app_service.name
 }

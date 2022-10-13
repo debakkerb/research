@@ -108,6 +108,12 @@ variable "organization_id" {
   type        = string
 }
 
+variable "project_viewers" {
+  description = "List of users who require Viewer access on the project."
+  type        = set(string)
+  default     = []
+}
+
 variable "project_name" {
   description = "Name of the project."
   type        = string

@@ -48,19 +48,18 @@ func main() {
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
-	cookie, err := generateSignedCookie()
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	http.SetCookie(w, cookie)
-	r.AddCookie(cookie)
-
 	path := r.URL.Path
 
 	if path == "/" {
 		path += "index.html"
+	}
+
+	cookie, err := generateSignedCookie(path)
+	http.SetCookie(w, cookie)
+	r.AddCookie(cookie)
+
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	http.Redirect(w, r, fmt.Sprintf("https://%s%s", HOST, path), http.StatusFound)
@@ -95,7 +94,7 @@ func readKey() ([]byte, error) {
 	return d[:n], nil
 }
 
-func generateSignedCookie() (*http.Cookie, error) {
+func generateSignedCookie(path string) (*http.Cookie, error) {
 
 	var (
 		domain     = os.Getenv("HOST")
@@ -113,6 +112,7 @@ func generateSignedCookie() (*http.Cookie, error) {
 		Name:   "Cloud-CDN-Cookie",
 		Value:  signedValue,
 		Domain: domain,
+		Path:   path,
 		MaxAge: int(expiration.Seconds()),
 	}
 

@@ -95,6 +95,7 @@ resource "google_compute_url_map" "lb_url_map" {
           header_name  = "cookie"
           prefix_match = "Cloud-CDN-Cookie"
         }
+
       }
       service = google_compute_backend_bucket.backend.id
     }
