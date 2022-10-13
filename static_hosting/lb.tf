@@ -80,11 +80,11 @@ resource "google_compute_url_map" "lb_url_map" {
 
   host_rule {
     hosts        = var.ssl_domain_names
-    path_matcher = "cookie-matcher"
+    path_matcher = "cdn-cookie-matcher"
   }
 
   path_matcher {
-    name            = "cookie-matcher"
+    name            = "cdn-cookie-matcher"
     default_service = google_compute_backend_bucket.backend.id
 
     route_rules {

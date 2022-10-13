@@ -17,8 +17,13 @@
 resource "google_secret_manager_secret" "cdn_signing_key" {
   project   = module.project.project_id
   secret_id = var.cdn_signing_key_secret_name
+
   replication {
-    automatic = true
+    user_managed {
+      replicas {
+        location = var.region
+      }
+    }
   }
 }
 

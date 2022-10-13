@@ -34,7 +34,7 @@ resource "google_compute_backend_service" "login_app_service" {
   timeout_sec = 30
 
   log_config {
-    enable = true
+    enable = var.enable_backend_service_logging
   }
 
   backend {

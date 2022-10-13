@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+output "cdn_secret_name" {
+  value = google_secret_manager_secret.cdn_signing_key.name
+}
+
 output "image_name" {
   value = local.full_image_name
 }
@@ -24,4 +28,8 @@ output "load_balancer_ip_address" {
 
 output "project_id" {
   value = module.project.project_id
+}
+
+output "ssl_certificate_name" {
+  value = google_compute_managed_ssl_certificate.lb_ssl_certificate.name
 }

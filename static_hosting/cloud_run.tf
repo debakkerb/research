@@ -51,10 +51,6 @@ resource "google_cloud_run_service" "login_service" {
           value = var.ssl_domain_names.0
         }
 
-        env {
-          name  = "PROJECT_ID"
-          value = module.project.project_id
-        }
       }
     }
   }

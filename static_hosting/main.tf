@@ -55,16 +55,14 @@ resource "google_storage_bucket" "static_asset_storage_bucket" {
   }
 }
 
-resource "google_storage_bucket_object" "module_one_page" {
-  name   = "module_one/index.html"
-  bucket = google_storage_bucket.static_asset_storage_bucket.name
-  source = "${path.module}/static/module_one.html"
-}
+resource "google_storage_bucket_object" "modules" {
+  for_each = toset(["one", "two"])
+  name     = "module_${each.value}/index.html"
+  bucket   = google_storage_bucket.static_asset_storage_bucket.name
 
-resource "google_storage_bucket_object" "module_two_page" {
-  name   = "module_two/index.html"
-  bucket = google_storage_bucket.static_asset_storage_bucket.name
-  source = "${path.module}/static/module_two.html"
+  content = templatefile("${path.module}/static/sample_index.html", {
+    NAME = each.value
+  })
 }
 
 resource "google_storage_bucket_object" "index_page" {
@@ -88,4 +86,3 @@ resource "google_storage_bucket_iam_member" "cdn_access" {
     google_compute_backend_bucket_signed_url_key.signed_key
   ]
 }
-

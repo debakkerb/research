@@ -45,17 +45,23 @@ variable "cdn_signing_key" {
   type        = string
   default     = null
 }
+
 variable "cdn_signing_url_key_name" {
   description = "Name of the key to sign the CDN URLs"
   type        = string
   default     = "cdn-signed-url-key"
 }
 
-
 variable "cors_origin" {
   description = "Origin for the storage bucket."
   type        = list(string)
   default     = []
+}
+
+variable "enable_backend_service_logging" {
+  description = "Enable logging on the NEG backend service."
+  type        = bool
+  default     = true
 }
 
 variable "folder_id" {
@@ -118,10 +124,3 @@ variable "ssl_domain_names" {
   description = "List of domains for the SSL certificate."
   type        = list(string)
 }
-
-variable "storage_bucket_name" {
-  description = "Name of the storage bucket.  This should correspond to the URL where these resources should be accessible."
-  type        = string
-}
-
-
