@@ -14,8 +14,16 @@
  * limitations under the License.
  */
 
+output "backend_bucket_name" {
+  value = google_compute_backend_bucket.backend.name
+}
+
 output "cdn_secret_name" {
   value = google_secret_manager_secret.cdn_signing_key.name
+}
+
+output "cdn_sign_key_name" {
+  value = google_compute_backend_bucket_signed_url_key.signed_key.name
 }
 
 output "image_name" {

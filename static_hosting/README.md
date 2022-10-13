@@ -52,16 +52,19 @@ terraform init -upgrade -reconfigure
 
 # Apply the changes
 terraform apply -auto-approve -var="cdn_signing_key=${SIGNING_KEY}"
-
-# Store the signing key in secret manager
-printf "${SIGNING_KEY}" | gcloud secrets versions add [SECRET_NAME] --data-file=-
 ```
 
-Even though the CDN signing key is sensitive, it will end up in the Terraform state this way.  It's not recommended to do this in a PRD environment, so a better approach is to generate the key outside of the Terraform code and push it to Secret Manager directly:
+Even though the CDN signing key is sensitive, it will end up in the Terraform state this way.  It's not recommended to do this in a PRD environment, so a better approach is to generate the key outside of the Terraform code and push it to Secret Manager and the backend service directly:
 
 ```shell
-echo "$(head -c 16 /dev/urandom | base64 tr +/ -_)" | \
-  gcloud secret versions add [SECRET_ID] --data-file=- --project [PROJECT_ID] 
+SIGNING_KEY=$(head -c 16 /dev/urandom | base64 | tr +/ -_)
+PROJECT_ID=$(terraform output -json | jq -r .project_id.value)
+
+printf "$SIGNING_KEY" | gcloud secret versions add $(terraform output -json | jq -r .cdn_secret_name.value) --data-file=- --project $PROJECT_ID
+
+echo "$SIGNING_KEY" > key.fm
+gcloud compute backend-buckets add-signed-url-key $(terraform output -json | jq -r .backend_bucket_name.value) --key-file ./key.fm --key-name $(terraform output -json | jq -r .add-signed-url-key.value)
+rm -rf key.fm
 ```
 
 When everything is created, it will take a while for the SSL certificate to be generated, signed and generally made available.  You can check the status of the SSL certificate by running the following command:
