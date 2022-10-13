@@ -82,3 +82,13 @@ You can find the correct value by running the following command:
 ```shell
 terraform output -json | jq -r .load_balancer_ip_address.value
 ```
+
+## Development
+
+If you want to further develop the application, you need to generate new image tags, as otherwise Cloud Run will not point to the updated service.  
+
+```shell
+terraform apply -var="image_tag=$(date +%s)"
+```
+
+Every time this command runs, it will generate a new image tag and will update the latest revision of Cloud Run.
