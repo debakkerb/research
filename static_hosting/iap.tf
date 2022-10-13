@@ -24,20 +24,3 @@ resource "google_iap_client" "project_oauth_client" {
   brand        = google_iap_brand.project_brand.name
   display_name = var.iap_client_display_name
 }
-
-resource "google_project_iam_audit_config" "iap_audit_config" {
-  project = module.project.project_id
-  service = "iap.googleapis.com"
-
-  audit_log_config {
-    log_type = "ADMIN_READ"
-  }
-
-  audit_log_config {
-    log_type = "DATA_READ"
-  }
-
-  audit_log_config {
-    log_type = "DATA_WRITE"
-  }
-}
