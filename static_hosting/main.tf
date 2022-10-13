@@ -63,7 +63,7 @@ resource "google_storage_bucket" "static_asset_storage_bucket" {
 }
 
 resource "google_storage_bucket_object" "modules" {
-  for_each = toset(["one", "two"])
+  for_each = var.upload_sample_content ? toset(["one", "two"]) : []
   name     = "module_${each.value}/index.html"
   bucket   = google_storage_bucket.static_asset_storage_bucket.name
 

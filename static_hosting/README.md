@@ -60,18 +60,25 @@ Even though the CDN signing key is sensitive, it will end up in the Terraform st
 SIGNING_KEY=$(head -c 16 /dev/urandom | base64 | tr +/ -_)
 PROJECT_ID=$(terraform output -json | jq -r .project_id.value)
 
-printf "$SIGNING_KEY" | gcloud secret versions add $(terraform output -json | jq -r .cdn_secret_name.value) --data-file=- --project $PROJECT_ID
+printf "$SIGNING_KEY" | gcloud secrets versions add $(terraform output -json | jq -r .cdn_secret_name.value) --data-file=- --project $PROJECT_ID
 
 echo "$SIGNING_KEY" > key.fm
-gcloud compute backend-buckets add-signed-url-key $(terraform output -json | jq -r .backend_bucket_name.value) --key-file ./key.fm --key-name $(terraform output -json | jq -r .add-signed-url-key.value)
+gcloud compute backend-buckets add-signed-url-key $(terraform output -json | jq -r .backend_bucket_name.value) --key-file=./key.fm --key-name=$(terraform output -json | jq -r .cdn_sign_key_name.value)
 rm -rf key.fm
 ```
 
 When everything is created, it will take a while for the SSL certificate to be generated, signed and generally made available.  You can check the status of the SSL certificate by running the following command:
 
 ```shell
-gcloud compute ssl-certificates describe $(terraform output -json | jq -r .ssl_certificate_name.value) --format "value(managed.status)
+gcloud compute ssl-certificates describe $(terraform output -json | jq -r .ssl_certificate_name.value) --format "value(managed.status)"
 ```
 
 Status should be `ACTIVE` before you can send requests to the SSL endpoint.
 
+### DNS Configuration
+Before the SSL certificate can become available, it's important to create an A-record on the DNS load balancer that matches the value for `ssl_domain_names`.  Create an A-record and point it to the public IP address of the Load Balancer.  
+
+You can find the correct value by running the following command:
+```shell
+terraform output -json | jq -r .load_balancer_ip_address.value
+```

@@ -130,3 +130,9 @@ variable "ssl_domain_names" {
   description = "List of domains for the SSL certificate."
   type        = list(string)
 }
+
+variable "upload_sample_content" {
+  description = "Upload sample content to the Cloud Storage bucket"
+  type        = bool
+  default     = false
+}
