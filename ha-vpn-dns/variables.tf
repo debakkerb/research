@@ -36,5 +36,33 @@ variable "project_name" {
   default     = "rsrch-ha-vpn-tst"
 }
 
+variable "network_one_name" {
+  description = "Name of the first network."
+  type        = string
+  default     = "ha-vpn-nw-one"
+}
 
+variable "network_two_name" {
+  description = "Name of the second network."
+  type        = string
+  default     = "ha-vpn-nw-two"
+}
+
+variable "subnet_one_name" {
+  description = "Name of the first subnet"
+  type        = string
+  default     = "ha-vpn-snw-one"
+}
+
+variable "subnet_one_cidr_range" {
+  description = "CIDR range for the first subnet"
+  type        = string
+  default     = "10.0.0.0/24"
+}
+
+variable "subnet_one_region" {
+  description = "Region for the first subnet"
+  type        = string
+  default     = "europe-west1"
+}
 
