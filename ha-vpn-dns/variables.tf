@@ -48,11 +48,48 @@ variable "network_two_name" {
   default     = "ha-vpn-nw-two"
 }
 
+variable "network_two_router_name" {
+  description = "Name of the network router, attached to the second network."
+  type        = string
+  default     = "ha-vpn-rtr-two"
+}
+
 variable "subnet_one_name" {
   description = "Name of the first subnet"
   type        = string
   default     = "ha-vpn-snw-one"
 }
+
+variable "network_one_router_name" {
+  description = "Name of the network router, attached to the first network."
+  type        = string
+  default     = "ha-vpn-rtr-one"
+}
+
+variable "router_one_interface_one_peer_ip_address" {
+  description = "IP address of the BGP exchange"
+  type        = string
+  default     = "169.254.0.2"
+}
+
+variable "router_one_interface_zero_peer_name" {
+  description = "Name of the BGP session, peering between router 1 and 2, running over the first VPN tunnel."
+  type        = string
+  default     = "ha-vpn-peer-one-two-0"
+}
+
+variable "router_one_interface_two_peer_ip_address" {
+  description = "IP address of the BGP exchange"
+  type        = string
+  default     = "169.254.0.1"
+}
+
+variable "router_one_interface_one_peer_name" {
+  description = "Name of the BGP session, peering between router 1 and 2, running over the second VPN tunnel."
+  type        = string
+  default     = "ha-vpn-peer-one-two-1"
+}
+
 
 variable "subnet_one_cidr_range" {
   description = "CIDR range for the first subnet"
@@ -66,3 +103,134 @@ variable "subnet_one_region" {
   default     = "europe-west1"
 }
 
+variable "subnet_two_name" {
+  description = "Name of the first subnet"
+  type        = string
+  default     = "ha-vpn-snw-two"
+}
+
+variable "subnet_two_cidr_range" {
+  description = "CIDR range for the first subnet"
+  type        = string
+  default     = "10.0.0.0/24"
+}
+
+variable "subnet_two_region" {
+  description = "Region for the first subnet"
+  type        = string
+  default     = "europe-west2"
+}
+
+variable "tunnel_four_interface_ip_range" {
+  description = "IP range for the interface, attached to tunnel 4."
+  type        = string
+  default     = "169.254.1.1/30"
+}
+
+variable "tunnel_four_interface_name" {
+  description = "Name for the interface, VPN Gateway 2 to VPN Gateway 1, interface 1."
+  type        = string
+  default     = "vpn-tunnel-four-interface"
+}
+
+variable "tunnel_one_interface_name" {
+  description = "Name for the interface, VPN Gateway 1 to VPN Gateway 2, interface 0."
+  type        = string
+  default     = "vpn-tunnel-one-interface"
+}
+
+variable "tunnel_one_interface_ip_range" {
+  description = "IP range for the interface, attached to tunnel 1."
+  type        = string
+  default     = "169.254.0.1/30"
+}
+
+variable "tunnel_three_interface_ip_range" {
+  description = "IP range for the interface, attached to tunnel 3"
+  type        = string
+  default     = "169.254.0.2/30"
+}
+
+variable "tunnel_three_interface_name" {
+  description = "Name for the interface, Gateway 2 to VPN Gateway 1, interface 1."
+  type        = string
+  default     = "vpn-tunnel-three-interface"
+}
+
+variable "tunnel_two_interface_ip_range" {
+  description = "IP range for the interface, attached to tunnel 2."
+  type        = string
+  default     = "169.254.1.2/30"
+}
+
+variable "tunnel_two_interface_name" {
+  description = "NAme for the interface, VPN Gateway 1 to VPN Gateway 2, interface 1."
+  type        = string
+  default     = "vpn-tunnel-two-interface"
+}
+
+variable "vpn_gateway_one_name" {
+  description = "Name of the VPN Gateway attached to network one"
+  type        = string
+  default     = "vpn-gateway-one"
+}
+
+variable "vpn_gateway_two_name" {
+  description = "Name of the VPN Gateway attached to network two"
+  type        = string
+  default     = "vpn-gateway-two"
+}
+
+variable "vpn_gateway_region" {
+  description = "Region where both VPN Gateways will reside."
+  type        = string
+  default     = "europe-west1"
+}
+
+variable "vpn_tunnel_four_name" {
+  description = "Name for the fourth VPN tunnel, going from VPN Gateway 2 to VPN Gateway 1, on interface 0"
+  type        = string
+  default     = "vpn-tunnel-four"
+}
+
+variable "vpn_tunnel_one_name" {
+  description = "Name for the first VPN tunnel, going from VPN Gateway 1 to VPN Gateway 2, on interface 0."
+  type        = string
+  default     = "vpn-tunnel-one"
+}
+
+variable "vpn_tunnel_three_name" {
+  description = "Name for the third VPN tunnel, going from VPN Gateway 2 to VPN Gateway 1, on interface 0."
+  type        = string
+  default     = "vpn-tunnel-three"
+}
+
+variable "vpn_tunnel_two_name" {
+  description = "Name for the second tunnel, going from VPN Gateway 1 to VPN Gateway 2, on interface 1"
+  type        = string
+  default     = "vpn-tunnel-two"
+}
+
+variable "router_two_interface_zero_peer_name" {
+  description = "BGP peering, router 2 to router 1, interface 0"
+  type        = string
+  default     = "ha-vpn-peer-two-one-0"
+}
+
+variable "router_two_interface_zero_peer_ip_address" {
+  description = "IP address for the peering session"
+  type        = string
+  default     = "169.254.0.1"
+}
+
+variable "router_two_interface_one_peer_name" {
+  description = "BGP peering, router 2 to router 1, interface 1"
+  type        = string
+  default     = "ha-vpn-peer-two-one-1"
+}
+
+variable "router_two_interface_one_peer_ip_address" {
+  description = "IP address for the peering session"
+  type        = string
+  default     = "169.254.1.2"
+}

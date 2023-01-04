@@ -17,3 +17,7 @@
 output "project_id" {
   value = module.vpn_project.project_id
 }
+
+output "network_one_selflink" {
+  value = google_compute_network.network_two.self_link
+}

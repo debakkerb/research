@@ -21,8 +21,9 @@ resource "google_compute_network" "network_one" {
 }
 
 resource "google_compute_network" "network_two" {
-  project = module.vpn_project.project_id
-  name    = var.network_two_name
+  project                 = module.vpn_project.project_id
+  name                    = var.network_two_name
+  auto_create_subnetworks = false
 }
 
 resource "google_compute_subnetwork" "subnetwork_one" {
@@ -33,3 +34,38 @@ resource "google_compute_subnetwork" "subnetwork_one" {
   private_ip_google_access = true
   region                   = var.subnet_one_region
 }
+
+resource "google_compute_subnetwork" "subnetwork_two" {
+  project                  = module.vpn_project.project_id
+  name                     = var.subnet_two_name
+  network                  = google_compute_network.network_two.name
+  ip_cidr_range            = var.subnet_two_cidr_range
+  private_ip_google_access = true
+  region                   = var.subnet_two_region
+}
+
+resource "google_compute_router" "network_one_router" {
+  project     = module.vpn_project.project_id
+  name        = var.network_one_router_name
+  network     = google_compute_network.network_one.name
+  description = "Router in network ${google_compute_network.network_one.name}, region ${var.vpn_gateway_region}"
+  region      = var.vpn_gateway_region
+
+  bgp {
+    asn = 64514
+  }
+}
+
+resource "google_compute_router" "network_two_router" {
+  project     = module.vpn_project.project_id
+  name        = var.network_two_router_name
+  network     = google_compute_network.network_two.name
+  description = "Router in network ${google_compute_network.network_two.name}, region ${var.vpn_gateway_region}"
+  region      = var.vpn_gateway_region
+
+  bgp {
+    asn = 64515
+  }
+}
+
+
