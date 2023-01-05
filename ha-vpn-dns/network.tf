@@ -68,4 +68,31 @@ resource "google_compute_router" "network_two_router" {
   }
 }
 
+resource "google_compute_firewall" "iap_ssh_access_rule" {
+  for_each = {
+    "${google_compute_network.network_one.name}" = google_service_account.vm_one_identity.email,
+    "${google_compute_network.network_two.name}" = google_service_account.vm_two_identity.email
+  }
+
+  project     = module.vpn_project.project_id
+  name        = "ssh-iap-access-${each.key}"
+  network     = each.key
+  description = "Firewall rule to allow SSH access to both VMs."
+
+  allow {
+    protocol = "tcp"
+    ports    = ["22"]
+  }
+
+  source_ranges = ["35.235.240.0/20"]
+
+  target_service_accounts = [each.value]
+}
+
+resource "google_project_iam_member" "tcp_iam_access" {
+  for_each = var.trusted_users
+  project  = module.vpn_project.project_id
+  role     = "roles/compute.instanceAdmin.v1"
+  member   = each.value
+}
 

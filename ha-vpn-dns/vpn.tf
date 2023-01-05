@@ -126,7 +126,6 @@ resource "google_compute_router_interface" "tunnel_four_interface_one" {
 }
 
 //  BGP Peering
-/*
 resource "google_compute_router_peer" "router_one_interface_zero" {
   project                   = module.vpn_project.project_id
   name                      = var.router_one_interface_zero_peer_name
@@ -170,4 +169,3 @@ resource "google_compute_router_peer" "router_two_interface_one" {
   interface                 = google_compute_router_interface.tunnel_four_interface_one.name
   router                    = google_compute_router.network_two_router.name
 }
-*/
