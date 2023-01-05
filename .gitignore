@@ -16,3 +16,4 @@ apache_beam_gke/
 apache_beam_gke/images/
 
 **/tags
+**/*.swp

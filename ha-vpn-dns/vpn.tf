@@ -88,7 +88,7 @@ resource "google_compute_vpn_tunnel" "vpn_gateway_tunnel_21_11" {
 }
 
 // Router interface
-// Cloud Router 1 - VPN tunnel 1 (CR 1/0 to CR 2/0
+// Cloud Router 1 - VPN tunnel 1 - CR 1/0 to CR 2/0
 resource "google_compute_router_interface" "tunnel_one_interface_zero" {
   project    = module.vpn_project.project_id
   name       = var.tunnel_one_interface_name
@@ -126,6 +126,7 @@ resource "google_compute_router_interface" "tunnel_four_interface_one" {
 }
 
 //  BGP Peering
+/*
 resource "google_compute_router_peer" "router_one_interface_zero" {
   project                   = module.vpn_project.project_id
   name                      = var.router_one_interface_zero_peer_name
@@ -169,4 +170,4 @@ resource "google_compute_router_peer" "router_two_interface_one" {
   interface                 = google_compute_router_interface.tunnel_four_interface_one.name
   router                    = google_compute_router.network_two_router.name
 }
-
+*/
