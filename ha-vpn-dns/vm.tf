@@ -51,6 +51,10 @@ resource "google_compute_instance" "vm_one" {
     subnetwork = google_compute_subnetwork.subnetwork_one.self_link
   }
 
+  network_interface {
+    subnetwork = google_compute_subnetwork.subnetwork_one.self_link
+  }
+
   metadata = {
     enable-oslogin-2fa : "TRUE"
   }
