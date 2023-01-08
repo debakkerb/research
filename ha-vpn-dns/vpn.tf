@@ -70,7 +70,7 @@ resource "google_compute_vpn_tunnel" "vpn_gateway_tunnel_11_21" {
   vpn_gateway           = google_compute_ha_vpn_gateway.vpn_gateway_one.id
   peer_gcp_gateway      = google_compute_ha_vpn_gateway.vpn_gateway_two.id
   region                = var.vpn_gateway_region
-  shared_secret         = random_string.tunnel_two_secret.result
+  shared_secret         = random_string.tunnel_one_secret.result
   router                = google_compute_router.network_one_router.id
   vpn_gateway_interface = 1
 }
@@ -82,7 +82,7 @@ resource "google_compute_vpn_tunnel" "vpn_gateway_tunnel_21_11" {
   vpn_gateway           = google_compute_ha_vpn_gateway.vpn_gateway_two.id
   peer_gcp_gateway      = google_compute_ha_vpn_gateway.vpn_gateway_one.id
   region                = var.vpn_gateway_region
-  shared_secret         = random_string.tunnel_two_secret.result
+  shared_secret         = random_string.tunnel_one_secret.result
   router                = google_compute_router.network_two_router.id
   vpn_gateway_interface = 1
 }

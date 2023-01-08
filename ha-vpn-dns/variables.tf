@@ -267,25 +267,25 @@ variable "vpn_gateway_region" {
 variable "vpn_tunnel_four_name" {
   description = "Name for the fourth VPN tunnel, going from VPN Gateway 2 to VPN Gateway 1, on interface 0"
   type        = string
-  default     = "vpn-tunnel-four"
+  default     = "vpn-tunnel-4"
 }
 
 variable "vpn_tunnel_one_name" {
   description = "Name for the first VPN tunnel, going from VPN Gateway 1 to VPN Gateway 2, on interface 0."
   type        = string
-  default     = "vpn-tunnel-one"
+  default     = "vpn-tunnel-1"
 }
 
 variable "vpn_tunnel_three_name" {
   description = "Name for the third VPN tunnel, going from VPN Gateway 2 to VPN Gateway 1, on interface 0."
   type        = string
-  default     = "vpn-tunnel-three"
+  default     = "vpn-tunnel-3"
 }
 
 variable "vpn_tunnel_two_name" {
   description = "Name for the second tunnel, going from VPN Gateway 1 to VPN Gateway 2, on interface 1"
   type        = string
-  default     = "vpn-tunnel-two"
+  default     = "vpn-tunnel-2"
 }
 
 variable "router_two_interface_zero_peer_name" {

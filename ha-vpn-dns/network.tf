@@ -89,6 +89,33 @@ resource "google_compute_firewall" "iap_ssh_access_rule" {
   target_service_accounts = [each.value]
 }
 
+resource "google_compute_firewall" "ping_access" {
+  for_each = {
+    "${google_compute_network.network_one.name}" = {
+      service_account = google_service_account.vm_one_identity.email
+      source_range    = var.subnet_two_cidr_range
+    },
+    "${google_compute_network.network_two.name}" = {
+      service_account = google_service_account.vm_two_identity.email
+      source_range    = var.subnet_one_cidr_range
+    }
+  }
+
+  project     = module.vpn_project.project_id
+  name        = "icmp-access-${each.key}"
+  network     = each.key
+  description = "Firewall rule to allow VMs to ping each other"
+
+  allow {
+    protocol = "icmp"
+    ports    = []
+  }
+
+  target_service_accounts = [each.value.service_account]
+
+  source_ranges = [each.value.source_range]
+}
+
 resource "google_project_iam_member" "tcp_iam_access" {
   for_each = var.trusted_users
   project  = module.vpn_project.project_id

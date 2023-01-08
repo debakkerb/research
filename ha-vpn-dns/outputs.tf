@@ -14,10 +14,19 @@
  * limitations under the License.
  */
 
+output "network_one_selflink" {
+  value = google_compute_network.network_two.self_link
+}
+
 output "project_id" {
   value = module.vpn_project.project_id
 }
 
-output "network_one_selflink" {
-  value = google_compute_network.network_two.self_link
+output "ssh_instance_one_command" {
+  value = "gcloud compute ssh ${google_compute_instance.vm_one.name} --zone ${google_compute_instance.vm_one.zone} --project ${module.vpn_project.project_id}"
 }
+
+output "ssh_instance_two_command" {
+  value = "gcloud compute ssh ${google_compute_instance.vm_two.name}  --zone ${google_compute_instance.vm_two.zone} --project ${module.vpn_project.project_id}"
+}
+
