@@ -13,3 +13,30 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
+
+variable "folder_id" {
+  description = "Folder ID where the project will be created."
+  type        = string
+}
+
+variable "organization_id" {
+  description = "Organization ID where the project will be created"
+  type        = string
+}
+
+variable "parent" {
+  description = "Parent where the firewall policy should be applied"
+  type        = string
+}
+
+variable "policy_short_name" {
+  description = "Short name for the firewall policy."
+  type        = string
+  default     = "rsrch-tst-policy"
+}
+
+variable "project_name" {
+  description = "Project name where we are going to define the hierarchical policy"
+  type        = string
+}
+
