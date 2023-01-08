@@ -51,6 +51,10 @@ resource "google_compute_instance" "vm_one" {
     subnetwork = google_compute_subnetwork.subnetwork_one.self_link
   }
 
+  metadata = {
+    enable-oslogin-2fa : "TRUE"
+  }
+
   service_account {
     email  = google_service_account.vm_one_identity.email
     scopes = ["cloud-platform"]
@@ -75,6 +79,10 @@ resource "google_compute_instance" "vm_two" {
     subnetwork = google_compute_subnetwork.subnetwork_two.self_link
   }
 
+  metadata = {
+    enable-oslogin-2fa : "TRUE"
+  }
+
   service_account {
     email  = google_service_account.vm_two_identity.email
     scopes = ["cloud-platform"]
@@ -95,20 +103,38 @@ resource "google_service_account_iam_member" "vm_two_access" {
   member             = each.value
 }
 
-resource "google_compute_instance_iam_member" "vm_one_tcp_access" {
+resource "google_iap_tunnel_instance_iam_member" "vm_one_tcp_access" {
+  for_each = var.trusted_users
+  project  = module.vpn_project.project_id
+  zone     = google_compute_instance.vm_one.zone
+  instance = google_compute_instance.vm_one.name
+  role     = "roles/iap.tunnelResourceAccessor"
+  member   = each.value
+}
+
+resource "google_iap_tunnel_instance_iam_member" "vm_two_tcp_access" {
+  for_each = var.trusted_users
+  project  = module.vpn_project.project_id
+  zone     = google_compute_instance.vm_two.zone
+  instance = google_compute_instance.vm_two.name
+  role     = "roles/iap.tunnelResourceAccessor"
+  member   = each.value
+}
+
+resource "google_compute_instance_iam_member" "vm_one_oslogin_member" {
   for_each      = var.trusted_users
+  project       = module.vpn_project.project_id
   zone          = google_compute_instance.vm_one.zone
   instance_name = google_compute_instance.vm_one.name
-  role          = "roles/iap.tunnelResourceAccessor"
+  role          = "roles/compute.osLogin"
   member        = each.value
 }
 
-resource "google_compute_instance_iam_member" "vm_two_tcp_access" {
+resource "google_compute_instance_iam_member" "vm_two_oslogin_member" {
   for_each      = var.trusted_users
   project       = module.vpn_project.project_id
   zone          = google_compute_instance.vm_two.zone
   instance_name = google_compute_instance.vm_two.name
-  role          = "roles/iap.tunnelResourceAccessor"
+  role          = "roles/compute.osLogin"
   member        = each.value
 }
-

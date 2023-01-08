@@ -26,6 +26,24 @@ module "vpn_project" {
   billing_account   = var.billing_account_id
 
   activate_apis = [
+    "iap.googleapis.com",
     "compute.googleapis.com",
   ]
 }
+
+module "vpn_test_project" {
+  source  = "terraform-google-modules/project-factory/google"
+  version = ">= v14.1.0"
+
+  name              = "vpn-hard-coded-tst"
+  random_project_id = true
+  org_id            = var.organization_id
+  folder_id         = var.folder_id
+  billing_account   = var.billing_account_id
+
+  activate_apis = [
+    "iap.googleapis.com",
+    "compute.googleapis.com",
+  ]
+}
+

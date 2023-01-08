@@ -3,4 +3,5 @@ network.tf
 outputs.tf
 variables.tf
 versions.tf
+vm.tf
 vpn.tf
