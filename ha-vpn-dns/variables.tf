@@ -39,31 +39,31 @@ variable "project_name" {
 variable "network_one_name" {
   description = "Name of the first network."
   type        = string
-  default     = "ha-vpn-nw-one"
+  default     = "ha-vpn-nw-1"
 }
 
 variable "network_two_name" {
   description = "Name of the second network."
   type        = string
-  default     = "ha-vpn-nw-two"
+  default     = "ha-vpn-nw-2"
 }
 
 variable "network_two_router_name" {
   description = "Name of the network router, attached to the second network."
   type        = string
-  default     = "ha-vpn-rtr-two"
+  default     = "ha-vpn-rtr-2"
 }
 
 variable "subnet_one_name" {
   description = "Name of the first subnet"
   type        = string
-  default     = "ha-vpn-snw-one"
+  default     = "ha-vpn-snw-1"
 }
 
 variable "network_one_router_name" {
   description = "Name of the network router, attached to the first network."
   type        = string
-  default     = "ha-vpn-rtr-one"
+  default     = "ha-vpn-rtr-1"
 }
 
 variable "router_one_interface_one_peer_ip_address" {
@@ -106,7 +106,7 @@ variable "subnet_one_region" {
 variable "subnet_two_name" {
   description = "Name of the first subnet"
   type        = string
-  default     = "ha-vpn-snw-two"
+  default     = "ha-vpn-snw-2"
 }
 
 variable "subnet_two_cidr_range" {
@@ -135,13 +135,13 @@ variable "tunnel_four_interface_ip_range" {
 variable "tunnel_four_interface_name" {
   description = "Name for the interface, VPN Gateway 2 to VPN Gateway 1, interface 1."
   type        = string
-  default     = "vpn-tunnel-four-interface"
+  default     = "vpn-tunnel-4-interface"
 }
 
 variable "tunnel_one_interface_name" {
   description = "Name for the interface, VPN Gateway 1 to VPN Gateway 2, interface 0."
   type        = string
-  default     = "vpn-tunnel-one-interface"
+  default     = "vpn-tunnel-1-interface"
 }
 
 variable "tunnel_one_interface_ip_range" {
@@ -159,7 +159,7 @@ variable "tunnel_three_interface_ip_range" {
 variable "tunnel_three_interface_name" {
   description = "Name for the interface, Gateway 2 to VPN Gateway 1, interface 1."
   type        = string
-  default     = "vpn-tunnel-three-interface"
+  default     = "vpn-tunnel-3-interface"
 }
 
 variable "tunnel_two_interface_ip_range" {
@@ -171,19 +171,19 @@ variable "tunnel_two_interface_ip_range" {
 variable "tunnel_two_interface_name" {
   description = "NAme for the interface, VPN Gateway 1 to VPN Gateway 2, interface 1."
   type        = string
-  default     = "vpn-tunnel-two-interface"
+  default     = "vpn-tunnel-2-interface"
 }
 
 variable "vm_one_identity_name" {
   description = "Name of the first service account, attached to the first VM."
   type        = string
-  default     = "vm-one-identity"
+  default     = "vm-1-identity"
 }
 
 variable "vm_two_identity_name" {
   description = "Name of the second service account, attached to the second VM."
   type        = string
-  default     = "vm-two-identity"
+  default     = "vm-2-identity"
 }
 
 variable "vm_image_family" {
@@ -201,7 +201,7 @@ variable "vm_image_project" {
 variable "vm_one_name" {
   description = "Name for the first VM"
   type        = string
-  default     = "vm-one"
+  default     = "vm-1"
 }
 
 variable "vm_one_machine_type" {
@@ -225,7 +225,7 @@ variable "vm_one_zone" {
 variable "vm_two_name" {
   description = "Name of the first VM"
   type        = string
-  default     = "vm-two"
+  default     = "vm-2"
 }
 
 variable "vm_two_machine_type" {
@@ -249,13 +249,13 @@ variable "vm_two_tags" {
 variable "vpn_gateway_one_name" {
   description = "Name of the VPN Gateway attached to network one"
   type        = string
-  default     = "vpn-gateway-one"
+  default     = "vpn-gateway-1"
 }
 
 variable "vpn_gateway_two_name" {
   description = "Name of the VPN Gateway attached to network two"
   type        = string
-  default     = "vpn-gateway-two"
+  default     = "vpn-gateway-2"
 }
 
 variable "vpn_gateway_region" {
