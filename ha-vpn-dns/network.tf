@@ -18,12 +18,14 @@ resource "google_compute_network" "network_one" {
   project                 = module.vpn_project.project_id
   name                    = var.network_one_name
   auto_create_subnetworks = false
+  routing_mode            = "GLOBAL"
 }
 
 resource "google_compute_network" "network_two" {
   project                 = module.vpn_project.project_id
   name                    = var.network_two_name
   auto_create_subnetworks = false
+  routing_mode            = "GLOBAL"
 }
 
 resource "google_compute_subnetwork" "subnetwork_one" {
