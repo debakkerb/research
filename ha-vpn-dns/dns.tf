@@ -60,9 +60,42 @@ resource "google_dns_record_set" "dns_record_vm_two" {
   rrdatas      = [google_compute_instance.vm_two.network_interface[0].network_ip]
 }
 
+resource "google_dns_managed_zone" "dns_zone_peer_two_one" {
+  project     = module.vpn_project.project_id
+  name        = "dns-zone-peer-network-2-1"
+  description = "DNS Peering zone between network 2 and network 1"
+  visibility  = "private"
+  dns_name    = "network-one-hosts.com."
+
+  private_visibility_config {
+    networks {
+      network_url = google_compute_network.network_two.id
+    }
+  }
+
+  peering_config {
+    target_network {
+      network_url = google_compute_network.network_one.id
+    }
+  }
+}
+
 resource "google_dns_managed_zone" "dns_zone_peer_one_two" {
   project     = module.vpn_project.project_id
   name        = "dns-zone-peer-network-1-2"
   description = "DNS Peering zone between network 1 and network 2"
   visibility  = "private"
+  dns_name    = "network-two-hosts.com."
+
+  private_visibility_config {
+    networks {
+      network_url = google_compute_network.network_one.id
+    }
+  }
+
+  peering_config {
+    target_network {
+      network_url = google_compute_network.network_two.id
+    }
+  }
 }
