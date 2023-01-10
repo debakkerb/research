@@ -14,25 +14,18 @@
  * limitations under the License.
  */
 
-variable "billing_account_id" {
-  description = "Billing account to attach to the project"
-  type        = string
-  sensitive   = true
+resource "google_compute_network" "default" {
+  project                 = module.project.project_id
+  name                    = var.network_name
+  auto_create_subnetworks = false
+  routing_mode            = "GLOBAL"
 }
 
-variable "folder_id" {
-  description = "Folder ID that should be the parent of the project."
-  type        = string
+resource "google_compute_subnetwork" "default" {
+  project                  = module.project.project_id
+  name                     = var.subnetwork_name
+  network                  = google_compute_network.default.name
+  ip_cidr_range            = var.subnet_cidr_range
+  private_ip_google_access = true
+  region                   = var.region
 }
-
-variable "organization_id" {
-  description = "Organization ID where the project should be created."
-  type        = string
-}
-
-variable "project_name" {
-  description = "Name of the project.  A unique identifier will be appended to the project ID automatically."
-  type        = string
-  default     = "rsrch-acm-tst"
-}
-

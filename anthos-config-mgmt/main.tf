@@ -15,7 +15,7 @@
  */
 
 
-module "vpn_project" {
+module "project" {
   source  = "terraform-google-modules/project-factory/google"
   version = ">= v14.1.0"
 
@@ -25,5 +25,9 @@ module "vpn_project" {
   folder_id         = var.folder_id
   billing_account   = var.billing_account_id
 
-  activate_apis = []
+  activate_apis = [
+    "container.googleapis.com",
+  ]
 }
+
+
