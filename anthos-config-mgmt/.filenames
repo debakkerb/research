@@ -1,4 +1,5 @@
 main.tf
+network.tf
 outputs.tf
 variables.tf
 versions.tf

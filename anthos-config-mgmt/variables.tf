@@ -25,6 +25,12 @@ variable "folder_id" {
   type        = string
 }
 
+variable "network_name" {
+  description = "Name of the network where the ACM cluster will be created."
+  type        = string
+  default     = "acm-cc-nw"
+}
+
 variable "organization_id" {
   description = "Organization ID where the project should be created."
   type        = string
@@ -34,5 +40,23 @@ variable "project_name" {
   description = "Name of the project.  A unique identifier will be appended to the project ID automatically."
   type        = string
   default     = "rsrch-acm-tst"
+}
+
+variable "region" {
+  description = "Default region for all resources inside this project."
+  type        = string
+  default     = "europe-west1"
+}
+
+variable "subnet_cidr_range" {
+  description = "Primary IP range of the subnet where the ACM cluster will run"
+  type        = string
+  default     = "10.0.0.0/16"
+}
+
+variable "subnetwork_name" {
+  description = "Name of the subnetwork where the ACM cluster will run."
+  type        = string
+  default     = "europe-west1"
 }
 
