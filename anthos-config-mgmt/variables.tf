@@ -14,6 +14,30 @@
  * limitations under the License.
  */
 
+variable "acm_cluster_identity_name" {
+  description = "Identity name of the service account attached to the GKE cluster"
+  type        = string
+  default     = "acm-cluster-id"
+}
+
+variable "acm_cluster_master_cidr_block" {
+  description = "CIDR block that can be used for the GKE control plane "
+  type        = string
+  default     = "10.255.0.0/28"
+}
+
+variable "acm_cluster_name" {
+  description = "Name of the ACM cluster"
+  type        = string
+  default     = "acm-main-cluster"
+}
+
+variable "acm_cluster_location" {
+  description = "Location where the Anthos Config Mgmt cluster will be created.  Can either be a region (regional cluster) or a zone (zonal cluster).  Make sure it corresponds to the Region variable, as that is where the subnet will be created."
+  type        = string
+  default     = "europe-west1"
+}
+
 variable "billing_account_id" {
   description = "Billing account to attach to the project"
   type        = string
