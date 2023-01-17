@@ -48,9 +48,13 @@ resource "google_container_cluster" "acm_cluster" {
     }
   }
 
-  ip_allocation_policy {}
+  ip_allocation_policy {
+    cluster_ipv4_cidr_block = ""
+    services_ipv4_cidr_block = ""
+  }
 
   depends_on = [
     google_project_iam_member.cluster_identity_permissions
   ]
 }
+
